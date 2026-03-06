@@ -8,6 +8,9 @@ import { CollectionsModule } from './modules/collections/collections.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { DatabaseModule } from './shared/database/database.module';
 import { GroceryModule } from './modules/grocery/grocery.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -21,7 +24,14 @@ import { GroceryModule } from './modules/grocery/grocery.module';
     ProfileModule,
     DatabaseModule,
     GroceryModule,
+    AuthModule,
   ],
   controllers: [HealthController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule { }

@@ -2,14 +2,16 @@ import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { SearchRecipesQueryDto } from './dto/search-recipes.query.dto';
 import { SearchRecipesUseCase } from '../application/use-cases/search-recipes.use-case';
 import { GetRecipeDetailsUseCase } from '../application/use-cases/get-recipe-details.use-case';
-import { ApiParam, ApiQuery, ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiParam, ApiQuery, ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CookFromPantryQueryDto } from './dto/cook-from-pantry.query.dto';
 import { CookFromPantryUseCase } from '../application/use-cases/cook-from-pantry.use-case';
 import { GetPopularRecipesUseCase } from '../application/use-cases/get-popular-recipes.use-case';
 import { GetCategoriesUseCase } from '../application/use-cases/get-categories.use-case';
 import { GetRecommendationsUseCase } from '../application/use-cases/get-recommendations.use-case';
 import { GetPopularQueryDto } from './dto/get-popular.query.dto';
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 
+@ApiBearerAuth('bearer')
 @ApiTags('Recipes')
 @Controller('recipes')
 export class RecipesController {
@@ -62,8 +64,7 @@ export class RecipesController {
 
   @ApiOperation({ summary: 'Get personalized recipe recommendations for the user' })
   @Get('recommendations')
-  recommendations() {
-    const userId = 'dev-user-001';
+  recommendations(@CurrentUser() userId: string) {
     return this.getRecommendationsUC.execute({
       userId,
       limit: 12,
@@ -84,8 +85,7 @@ export class RecipesController {
 
   @ApiOperation({ summary: 'Find recipes based on current pantry ingredients' })
   @Post('cook-from-pantry')
-  cookFromPantry(@Query() q: CookFromPantryQueryDto) {
-    const userId = 'dev-user-001';
+  cookFromPantry(@CurrentUser() userId: string, @Query() q: CookFromPantryQueryDto) {
     return this.cookFromPantryUC.execute(userId, q.maxMissing, q.limit);
   }
 }
