@@ -1,6 +1,6 @@
 # 📘 Architecture Standards
 
-Defines structural standards for scalable backend/frontend systems.
+Defines structural standards for scalable backend system.
 
 ---
 

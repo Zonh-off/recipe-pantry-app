@@ -1,52 +1,166 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* ─── Font Variables ────────────────────────────────────────── */
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-
-  --color-primary: oklch(0.65 0.24 169); /* Emerald Green for freshness */
-  --color-secondary: oklch(0.85 0.15 85); /* Warm Amber for grains */
-  --color-accent: oklch(0.6 0.2 30); /* Bold Red for focus */
-  --color-surface: oklch(0.15 0.05 240); /* Deep Slate for background */
-  --color-card: oklch(0.2 0.05 240); /* Lighter Slate for cards */
-
-  --animate-float: float 3s ease-in-out infinite;
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
 }
 
+/* ─── Light Theme Tokens (VISUAL_DIRECTION: light-first) ─────── */
 :root {
-  --background: var(--color-surface);
-  --foreground: oklch(0.98 0.01 240);
+  /* Backgrounds */
+  --background: oklch(0.983 0.003 247);
+  /* slate-50  */
+  --foreground: oklch(0.129 0.042 264);
+  /* slate-900 */
+
+  /* Surfaces */
+  --card: oklch(1 0 0);
+  /* white     */
+  --card-foreground: oklch(0.129 0.042 264);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264);
+
+  /* Primary → green-600 */
+  --primary: oklch(0.528 0.161 153);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Secondary → slate-100 surface */
+  --secondary: oklch(0.963 0.007 247);
+  --secondary-foreground: oklch(0.279 0.041 264);
+
+  /* Muted → slate-200 */
+  --muted: oklch(0.941 0.012 247);
+  --muted-foreground: oklch(0.554 0.046 264);
+  /* slate-500 */
+
+  /* Accent → green-100 */
+  --accent: oklch(0.951 0.051 163);
+  --accent-foreground: oklch(0.387 0.115 155);
+  /* green-700 */
+
+  /* Destructive → rose-500 */
+  --destructive: oklch(0.627 0.218 25);
+
+  /* Borders / inputs */
+  --border: oklch(0.882 0.016 247);
+  /* slate-200 */
+  --input: oklch(0.882 0.016 247);
+  --ring: oklch(0.528 0.161 153);
+  /* green-600 focus ring */
+
+  /* Radius tokens */
+  --radius: 0.625rem;
+
+  /* Sidebar (matches sidebar component) */
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.279 0.041 264);
+  --sidebar-primary: oklch(0.528 0.161 153);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.963 0.007 247);
+  --sidebar-accent-foreground: oklch(0.279 0.041 264);
+  --sidebar-border: oklch(0.882 0.016 247);
+  --sidebar-ring: oklch(0.528 0.161 153);
 }
 
+/* ─── Token → Tailwind Mapping ──────────────────────────────── */
+@theme inline {
+  --font-sans: var(--font-sans);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+/* ─── Base ───────────────────────────────────────────────────── */
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
   body {
-    @apply bg-surface text-foreground antialiased selection:bg-primary/30;
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans), system-ui, sans-serif;
   }
 }
 
+/* ─── App Utility Components ─────────────────────────────────── */
 @layer components {
-  .glass {
-    @apply bg-card/60 backdrop-blur-xl border border-white/10 shadow-2xl;
+
+  /* Recipe / content cards */
+  .card-surface {
+    @apply bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
   }
 
+  /* Primary CTA button */
   .btn-primary {
-    @apply px-6 py-3 bg-primary text-surface font-bold rounded-2xl 
-           transition-all duration-300 hover:scale-105 active:scale-95
-           hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
+  /* Secondary outlined button */
   .btn-secondary {
-    @apply px-6 py-3 bg-card border border-white/10 text-foreground font-semibold rounded-2xl
-           transition-all duration-300 hover:bg-white/10 active:scale-95 cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-white border border-slate-300 text-slate-800 font-semibold rounded-xl hover:bg-slate-50 transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .nav-link {
-    @apply text-foreground/60 hover:text-primary transition-colors duration-300 font-medium;
+  /* Category / metadata chip */
+  .chip {
+    @apply inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full;
+  }
+
+  .chip-green {
+    @apply bg-green-100 text-green-700;
+  }
+
+  .chip-amber {
+    @apply bg-amber-100 text-amber-700;
+  }
+
+  .chip-sky {
+    @apply bg-sky-100 text-sky-700;
+  }
+
+  .chip-rose {
+    @apply bg-rose-100 text-rose-700;
+  }
+
+  .chip-violet {
+    @apply bg-violet-100 text-violet-700;
   }
 }

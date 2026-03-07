@@ -1,147 +1,225 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { PageContainer, SectionHeader, AppButton } from '@/shared/components/ui';
+import { RecipeGrid, RecipeCard } from '@/features/recipes/components';
+import { CollectionCard } from '@/features/collections/components';
+import { EmptyState } from '@/shared/components/feedback';
+import { ChefHat, Plus } from 'lucide-react';
 
-const FADE_UP = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-};
-
-const mockItems = [
-  { id: '1', name: 'Eggs', amount: 12, unit: 'pcs' },
-  { id: '2', name: 'Flour', amount: 2, unit: 'kg' },
-  { id: '3', name: 'Milk', amount: 1, unit: 'L' },
-  { id: '4', name: 'Tomato', amount: 5, unit: 'pcs' },
+const RECOMMENDED_RECIPES = [
+  {
+    id: '1',
+    title: 'Creamy Avocado Pasta',
+    image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 15,
+    servings: 2,
+    calories: 450,
+    matchPercentage: 90,
+  },
+  {
+    id: '2',
+    title: 'Garlic Butter Salmon',
+    image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 25,
+    servings: 2,
+    calories: 600,
+    matchPercentage: 75,
+    missedIngredientCount: 2,
+  },
+  {
+    id: '3',
+    title: 'Quinoa Salad with Roasted Veggies',
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 30,
+    servings: 4,
+    calories: 380,
+    matchPercentage: 100,
+  },
+  {
+    id: '4',
+    title: 'Spicy Tofu Stir Fry',
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 20,
+    servings: 3,
+    calories: 420,
+    matchPercentage: 85,
+  },
 ];
 
-export default function PantryPage() {
-  const [items, setItems] = useState(mockItems);
-  const [ingredient, setIngredient] = useState("");
+const POPULAR_RECIPES = [
+  {
+    id: '5',
+    title: 'Classic Beef Burger',
+    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 20,
+    servings: 4,
+    calories: 750,
+  },
+  {
+    id: '6',
+    title: 'Homemade Margherita Pizza',
+    image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 45,
+    servings: 2,
+    calories: 820,
+  },
+  {
+    id: '7',
+    title: 'Mushroom Risotto',
+    image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 40,
+    servings: 4,
+    calories: 550,
+  },
+  {
+    id: '8',
+    title: 'Greek Salad with Feta',
+    image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 10,
+    servings: 2,
+    calories: 250,
+  },
+];
 
-  const handleAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!ingredient) return;
-    setItems([{ id: Date.now().toString(), name: ingredient, amount: 1, unit: 'pcs' }, ...items]);
-    setIngredient("");
-  };
+const QUICK_MEALS = [
+  {
+    id: '9',
+    title: 'Scrambled Eggs on Toast',
+    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 5,
+    servings: 1,
+    calories: 320,
+  },
+  {
+    id: '10',
+    title: 'Pesto Pasta',
+    image: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?auto=format&fit=crop&q=80&w=800',
+    readyInMinutes: 10,
+    servings: 1,
+    calories: 540,
+  },
+];
 
+const CATEGORIES = [
+  { name: 'Breakfast', emoji: '🍳' },
+  { name: 'Lunch', emoji: '🥗' },
+  { name: 'Dinner', emoji: '🍝' },
+  { name: 'Vegetarian', emoji: '🌱' },
+  { name: 'Vegan', emoji: '🥑' },
+  { name: 'Dessert', emoji: '🍰' },
+  { name: 'Snacks', emoji: '🥨' },
+  { name: 'Drinks', emoji: '🥤' },
+];
+
+export default function HomePage() {
   return (
-    <div className="max-w-7xl mx-auto px-8 w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-12 items-start">
-
-        {/* LEFT: Management Form */}
-        <motion.div
-          className="lg:col-span-5 glass p-10 rounded-3xl sticky top-32 group hover:border-primary/20 transition-colors duration-500"
-          initial="hidden"
-          animate="visible"
-          variants={FADE_UP}
-        >
-          <div className="mb-10">
-            <h2 className="text-4xl font-extrabold text-foreground tracking-tight mb-2">
-              Pantry<span className="text-primary italic font-serif">Manager</span>
-            </h2>
-            <p className="text-foreground/50 text-lg leading-relaxed">
-              Add the ingredients you have at home to get personalized recipe suggestions.
+    <PageContainer
+      title="Discover"
+      subtitle="Perfect recipes based on your pantry."
+      action={
+        <AppButton size="sm">
+          <Plus className="h-4 w-4" />
+          Add Ingredient
+        </AppButton>
+      }
+    >
+      <div className="space-y-12 pb-10">
+        {/* Banner / Hero Section */}
+        <section className="relative overflow-hidden rounded-3xl bg-green-600 p-8 md:p-12 text-white">
+          <div className="relative z-10 max-w-xl">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">What&apos;s in your pantry?</h2>
+            <p className="text-green-50 mb-8 text-lg opacity-90">
+              We found <span className="font-bold underline">8 recipes</span> you can cook right now with your current ingredients.
             </p>
-          </div>
-
-          <form onSubmit={handleAdd} className="space-y-6">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Ex. Organic Spinach"
-                value={ingredient}
-                onChange={(e) => setIngredient(e.target.value)}
-                className="w-full h-16 bg-surface/50 border border-white/10 rounded-2xl px-6 
-                           text-foreground placeholder:text-foreground/30 focus:outline-none 
-                           focus:border-primary/50 transition-all text-xl font-medium"
-              />
-              <div className="absolute right-4 top-4 text-foreground/40 text-sm">
-                Press Enter ↵
-              </div>
+            <div className="flex flex-wrap gap-4">
+              <AppButton variant="secondary" className="bg-white text-green-700 hover:bg-green-50 border-none shadow-lg">
+                Cook from Pantry
+              </AppButton>
+              <AppButton variant="ghost" className="text-white hover:bg-white/10 border border-white/20">
+                Update Pantry
+              </AppButton>
             </div>
-
-            <div className="flex gap-4">
-              <button type="submit" className="btn-primary flex-1 group relative overflow-hidden">
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  Add Ingredient
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-10 p-6 bg-primary/5 rounded-2xl border border-primary/10">
-            <p className="text-sm font-bold text-primary mb-4 uppercase tracking-widest">
-              Quick Tip
-            </p>
-            <p className="text-sm text-foreground/70 leading-relaxed italic">
-              "Keeping your pantry updated helps us find the most cost-effective and delicious recipes for your week."
-            </p>
           </div>
-        </motion.div>
+          <ChefHat className="absolute -bottom-10 -right-10 h-72 w-72 text-green-500/20 rotate-12" aria-hidden />
+        </section>
 
-        {/* RIGHT: Items Grid */}
-        <div className="lg:col-span-7">
-          <motion.div
-            className="flex justify-between items-center mb-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <h3 className="text-3xl font-bold">Your <span className="text-primary">Stash</span></h3>
-            <span className="bg-primary/20 text-primary px-4 py-1.5 rounded-full text-sm font-black border border-primary/20">
-              {items.length} Items Total
-            </span>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
-            {items.map((item, idx) => (
-              <motion.div
-                key={item.id}
-                className="glass p-8 rounded-3xl hover:translate-y-[-8px] transition-all duration-300 relative overflow-hidden group border-white/5"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.05 + 0.5 }}
+        {/* Categories Section */}
+        <section>
+          <SectionHeader title="Categories" />
+          <div className="flex flex-wrap gap-3">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.name}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-slate-700 font-medium hover:border-green-300 hover:bg-green-50 hover:text-green-700 transition-all shadow-sm active:scale-95"
               >
-                <div className="flex justify-between items-start relative z-10">
-                  <div>
-                    <h4 className="text-2xl font-black text-foreground mb-4 group-hover:text-primary transition-colors">
-                      {item.name}
-                    </h4>
-                    <div className="flex items-center gap-2">
-                      <span className="text-4xl font-extrabold text-foreground tracking-tighter">
-                        {item.amount}
-                      </span>
-                      <span className="text-foreground/40 font-bold uppercase text-xs tracking-tighter mt-3 underline decoration-primary/50 underline-offset-4">
-                        {item.unit}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setItems(items.filter(i => i.id !== item.id))}
-                    className="p-3 bg-white/5 rounded-xl hover:bg-accent hover:text-white transition-all scale-0 group-hover:scale-100"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                {/* Decorative background shape */}
-                <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/15 transition-all" />
-              </motion.div>
+                <span>{cat.emoji}</span>
+                <span>{cat.name}</span>
+              </button>
             ))}
-
-            {items.length === 0 && (
-              <div className="col-span-2 py-20 text-center glass rounded-3xl border-dashed border-white/10">
-                <p className="text-foreground/40 text-xl italic mb-6">Your pantry is empty and waiting...</p>
-                <button className="btn-secondary">Suggest Basics</button>
-              </div>
-            )}
           </div>
-        </div>
+        </section>
 
+        {/* Recommendations Section */}
+        <section>
+          <SectionHeader
+            title="Recommended for You"
+            subtitle="Based on your pantry ingredients"
+            action={<AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50">See all →</AppButton>}
+          />
+          <RecipeGrid>
+            {RECOMMENDED_RECIPES.map((recipe) => (
+              <RecipeCard key={recipe.id} {...recipe} />
+            ))}
+          </RecipeGrid>
+        </section>
+
+        {/* Quick Meals Section */}
+        <section className="bg-slate-50 -mx-6 px-6 py-12 rounded-[2.5rem]">
+          <SectionHeader
+            title="Quick Meals"
+            subtitle="Delicious recipes in under 15 minutes"
+            action={<AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50">See all →</AppButton>}
+          />
+          <RecipeGrid>
+            {QUICK_MEALS.map((recipe) => (
+              <RecipeCard key={recipe.id} {...recipe} />
+            ))}
+            {/* Show loading state placeholders or more items */}
+            <div className="hidden lg:block">
+              <RecipeCard
+                id="11"
+                title="Avocado Toast with Egg"
+                image="https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=800"
+                readyInMinutes={10}
+                servings={1}
+              />
+            </div>
+            <div className="hidden xl:block">
+              <RecipeCard
+                id="12"
+                title="Greek Yogurt Bowl"
+                image="https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&q=80&w=800"
+                readyInMinutes={5}
+                servings={1}
+              />
+            </div>
+          </RecipeGrid>
+        </section>
+
+        {/* Popular Recipes Section */}
+        <section>
+          <SectionHeader
+            title="Popular this Week"
+            subtitle="Most cooked by the community"
+            action={<AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50">See all →</AppButton>}
+          />
+          <RecipeGrid>
+            {POPULAR_RECIPES.map((recipe) => (
+              <RecipeCard key={recipe.id} {...recipe} />
+            ))}
+          </RecipeGrid>
+        </section>
       </div>
-    </div>
+    </PageContainer>
   );
 }

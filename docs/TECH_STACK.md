@@ -20,11 +20,15 @@ Auth: JWT
 
 # Frontend
 
-Framework: Next.js (App Router)  
-Language: TypeScript (strict)  
-Auth: NextAuth  
-Styling: TailwindCSS  
-State: Minimal local state (no Redux)
+* Next.js (App Router)
+* TypeScript (strict mode)
+* TailwindCSS
+* shadcn/ui
+* Axios
+* TanStack Query
+* React Hook Form
+* Zod
+* NextAuth
 
 ---
 
