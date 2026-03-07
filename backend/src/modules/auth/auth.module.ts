@@ -17,36 +17,36 @@ import { AuthController } from './transport/controllers/auth.controller';
 import { JwtStrategy } from '../../shared/strategies/jwt.strategy';
 
 @Module({
-    imports: [
-        DatabaseModule,
-        JwtModule.registerAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: async (configService: ConfigService) => ({
-                secret: configService.get<string>('JWT_SECRET'),
-                signOptions: { expiresIn: '15m' }, // Token expiration
-            }),
-        }),
-    ],
-    controllers: [AuthController],
-    providers: [
-        PasswordService,
-        TokenService,
-        RegisterUseCase,
-        LoginUseCase,
-        RefreshTokenUseCase,
-        LogoutUseCase,
-        GetMeUseCase,
-        JwtStrategy,
-        {
-            provide: USER_REPOSITORY,
-            useClass: PrismaUserRepository,
-        },
-        {
-            provide: REFRESH_TOKEN_REPOSITORY,
-            useClass: PrismaRefreshTokenRepository,
-        },
-    ],
-    exports: [JwtModule, TokenService],
+  imports: [
+    DatabaseModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '15m' }, // Token expiration
+      }),
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [
+    PasswordService,
+    TokenService,
+    RegisterUseCase,
+    LoginUseCase,
+    RefreshTokenUseCase,
+    LogoutUseCase,
+    GetMeUseCase,
+    JwtStrategy,
+    {
+      provide: USER_REPOSITORY,
+      useClass: PrismaUserRepository,
+    },
+    {
+      provide: REFRESH_TOKEN_REPOSITORY,
+      useClass: PrismaRefreshTokenRepository,
+    },
+  ],
+  exports: [JwtModule, TokenService],
 })
-export class AuthModule { }
+export class AuthModule {}

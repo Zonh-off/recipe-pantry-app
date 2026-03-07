@@ -11,31 +11,33 @@ import {
     Plus,
     ShoppingCart,
     CheckCircle2,
-    Bookmark
+    Bookmark,
+    CircleAlert
 } from "lucide-react";
 import {
     PageContainer,
     AppButton,
     SectionHeader,
     AppCard,
-    AppCardContent,
     AppBadge,
-    Chip,
-    Modal
+    Chip
 } from "@/shared/components/ui";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useRecipeDetails } from "@/features/recipes/api/recipes";
 import { LoadingSkeleton } from "@/shared/components/feedback";
 import { AddToCollectionModal } from "@/features/collections/components";
+import { useAuth } from "@/providers/auth-provider";
 
 export default function RecipeDetailsPage() {
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
+    const { user } = useAuth();
 
     const { data: recipe, isLoading, isError } = useRecipeDetails(id);
     const [isSaved, setIsSaved] = useState(false);
+    const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
     if (isLoading) {
         return (
@@ -75,13 +77,36 @@ export default function RecipeDetailsPage() {
             ? [recipe.instructions]
             : [];
 
-    const missingIngredients = ingredients.filter(i => i.status === "missing");
+    const missingIngredients = user ? ingredients.filter(i => i.status === "missing") : [];
+    const showPantryInfo = !!user;
+
+    const handleGatedAction = (e: React.MouseEvent) => {
+        if (!user) {
+            e.preventDefault();
+            e.stopPropagation();
+            setShowAuthPrompt(true);
+            return false;
+        }
+        return true;
+    };
 
     return (
         <PageContainer
             title=""
             className="pb-20"
         >
+            {showAuthPrompt && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center gap-3">
+                        <CircleAlert className="h-5 w-5 text-green-600" />
+                        <p className="text-sm font-medium text-green-800">
+                            Sign in to save recipes and track your pantry ingredients.
+                        </p>
+                    </div>
+                    <AppButton size="sm" onClick={() => router.push('/login')}>Sign In</AppButton>
+                </div>
+            )}
+
             <div className="flex flex-col gap-8">
                 {/* Navigation & Actions Top Bar */}
                 <div className="flex items-center justify-between pointer-events-auto">
@@ -100,21 +125,36 @@ export default function RecipeDetailsPage() {
                             variant="outline"
                             size="icon-sm"
                             className="rounded-full shadow-sm"
-                            onClick={() => setIsSaved(!isSaved)}
+                            onClick={(e) => {
+                                if (handleGatedAction(e)) {
+                                    setIsSaved(!isSaved);
+                                }
+                            }}
                         >
                             <Heart className={cn("h-4 w-4 transition-colors", isSaved ? "fill-rose-500 text-rose-500" : "text-slate-400")} />
                         </AppButton>
                         <AppButton variant="outline" size="icon-sm" className="rounded-full shadow-sm">
                             <Share2 className="h-4 w-4 text-slate-400" />
                         </AppButton>
-                        <AddToCollectionModal
-                            recipeId={recipe.id}
-                            trigger={
-                                <AppButton variant="outline" size="icon-sm" className="rounded-full shadow-sm">
-                                    <Bookmark className="h-4 w-4 text-slate-400" />
-                                </AppButton>
-                            }
-                        />
+                        {user ? (
+                            <AddToCollectionModal
+                                recipeId={recipe.id}
+                                trigger={
+                                    <AppButton variant="outline" size="icon-sm" className="rounded-full shadow-sm">
+                                        <Bookmark className="h-4 w-4 text-slate-400" />
+                                    </AppButton>
+                                }
+                            />
+                        ) : (
+                            <AppButton
+                                variant="outline"
+                                size="icon-sm"
+                                className="rounded-full shadow-sm"
+                                onClick={handleGatedAction}
+                            >
+                                <Bookmark className="h-4 w-4 text-slate-400" />
+                            </AppButton>
+                        )}
                     </div>
                 </div>
 
@@ -127,7 +167,7 @@ export default function RecipeDetailsPage() {
                             alt={recipe.title}
                             className="w-full h-full object-cover"
                         />
-                        {recipe.matchPercentage && recipe.matchPercentage >= 90 && (
+                        {showPantryInfo && recipe.matchPercentage && recipe.matchPercentage >= 90 && (
                             <div className="absolute top-4 left-4">
                                 <AppBadge variant="primary" className="bg-green-600/90 backdrop-blur-md px-3 py-1 text-sm border-none shadow-lg">
                                     Perfect Match
@@ -182,19 +222,37 @@ export default function RecipeDetailsPage() {
 
                         {/* CTA Actions */}
                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                            <AddToCollectionModal
-                                recipeId={recipe.id}
-                                trigger={
-                                    <AppButton className="flex-1 h-12 shadow-lg shadow-green-600/20 text-base">
-                                        <Bookmark className="h-5 w-5 mr-2" />
-                                        Save to Collection
-                                    </AppButton>
-                                }
-                            />
-                            {missingIngredients.length > 0 && (
-                                <AppButton variant="secondary" className="flex-1 h-12 border-slate-200">
+                            {user ? (
+                                <AddToCollectionModal
+                                    recipeId={recipe.id}
+                                    trigger={
+                                        <AppButton className="flex-1 h-12 shadow-lg shadow-green-600/20 text-base">
+                                            <Bookmark className="h-5 w-5 mr-2" />
+                                            Save to Collection
+                                        </AppButton>
+                                    }
+                                />
+                            ) : (
+                                <AppButton
+                                    className="flex-1 h-12 shadow-lg shadow-green-600/20 text-base"
+                                    onClick={handleGatedAction}
+                                >
+                                    <Bookmark className="h-5 w-5 mr-2" />
+                                    Save to Collection
+                                </AppButton>
+                            )}
+
+                            {ingredients.length > 0 && (
+                                <AppButton
+                                    variant="secondary"
+                                    className="flex-1 h-12 border-slate-200"
+                                    onClick={handleGatedAction}
+                                >
                                     <ShoppingCart className="h-5 w-5 mr-2" />
-                                    Get {missingIngredients.length} Ingredients
+                                    {showPantryInfo && missingIngredients.length > 0
+                                        ? `Get ${missingIngredients.length} Ingredients`
+                                        : "Add to grocery list"
+                                    }
                                 </AppButton>
                             )}
                         </div>
@@ -216,7 +274,7 @@ export default function RecipeDetailsPage() {
                                     <div key={idx} className="flex items-start gap-3 group">
                                         <div className={cn(
                                             "mt-1 p-0.5 rounded-full",
-                                            ingredient.status === "available" ? "text-green-600" : "text-slate-300"
+                                            showPantryInfo && ingredient.status === "available" ? "text-green-600" : "text-slate-300"
                                         )}>
                                             <CheckCircle2 className="h-5 w-5" />
                                         </div>
@@ -224,7 +282,7 @@ export default function RecipeDetailsPage() {
                                             <div className="flex justify-between items-baseline">
                                                 <span className={cn(
                                                     "text-sm font-medium",
-                                                    ingredient.status === "available" ? "text-slate-900" : "text-slate-500 italic"
+                                                    showPantryInfo && ingredient.status === "available" ? "text-slate-900" : "text-slate-500 italic"
                                                 )}>
                                                     {ingredient.name}
                                                 </span>
@@ -233,7 +291,7 @@ export default function RecipeDetailsPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                        {ingredient.status === "missing" && (
+                                        {showPantryInfo && ingredient.status === "missing" && (
                                             <AppButton variant="ghost" size="icon-xs" className="text-green-600 opacity-0 group-hover:opacity-100">
                                                 <Plus className="h-4 w-4" />
                                             </AppButton>
@@ -242,7 +300,7 @@ export default function RecipeDetailsPage() {
                                 ))}
                             </div>
 
-                            {missingIngredients.length > 0 && (
+                            {showPantryInfo && missingIngredients.length > 0 && (
                                 <div className="mt-8 p-4 bg-amber-50 rounded-2xl border border-amber-100 border-dashed">
                                     <p className="text-xs font-semibold text-amber-700 leading-snug">
                                         You're missing {missingIngredients.length} ingredients. Add them to your grocery list with one click.

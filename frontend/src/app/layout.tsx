@@ -37,7 +37,7 @@ export default function RootLayout({
       >
         <QueryProvider>
           <AuthProvider>
-            <AppShell>{children}</AppShell>
+            {children}
           </AuthProvider>
         </QueryProvider>
       </body>

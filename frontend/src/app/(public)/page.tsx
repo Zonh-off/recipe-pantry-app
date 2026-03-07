@@ -2,9 +2,11 @@
 
 import { PageContainer, SectionHeader, AppButton } from '@/shared/components/ui';
 import { RecipeGrid, RecipeCard } from '@/features/recipes/components';
-import { ChefHat, Plus } from 'lucide-react';
+import { ChefHat } from 'lucide-react';
 import { useRecipeRecommendations } from '@/features/recipes/api/recipes';
 import { LoadingSkeleton } from '@/shared/components/feedback';
+import { useAuth } from '@/providers/auth-provider';
+import { useRouter } from 'next/navigation';
 
 const CATEGORIES = [
   { name: 'Breakfast', emoji: '🍳' },
@@ -37,28 +39,45 @@ const POPULAR_RECIPES = [
 ];
 
 export default function HomePage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const { data: recommendations, isLoading } = useRecipeRecommendations();
 
   return (
     <PageContainer
       title="Discover"
-      subtitle="Perfect recipes based on your pantry."
+      subtitle={user ? "Perfect recipes based on your pantry." : "Discover delicious recipes to cook today."}
     >
       <div className="space-y-12 pb-10">
         {/* Banner / Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-green-600 p-8 md:p-12 text-white">
+        <section className="relative overflow-hidden rounded-3xl bg-green-600 p-8 md:p-12 text-white shadow-xl shadow-green-600/20">
           <div className="relative z-10 max-w-xl">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">What&apos;s in your pantry?</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
+              {user ? "What's in your pantry?" : "Cook with what you have."}
+            </h2>
             <p className="text-green-50 mb-8 text-lg opacity-90">
-              We found <span className="font-bold underline">8 recipes</span> you can cook right now with your current ingredients.
+              {user
+                ? <>We found <span className="font-bold underline">8 recipes</span> you can cook right now with your current ingredients.</>
+                : "Manage your ingredients, discover perfect recipes, and build grocery lists effortlessly."
+              }
             </p>
             <div className="flex flex-wrap gap-4">
-              <AppButton variant="secondary" className="bg-white text-green-700 hover:bg-green-50 border-none shadow-lg">
-                Cook from Pantry
+              <AppButton
+                variant="secondary"
+                className="bg-white text-green-700 hover:bg-green-50 border-none shadow-lg px-8 h-12 text-base font-bold"
+                onClick={() => router.push(user ? '/pantry' : '/register')}
+              >
+                {user ? "Cook from Pantry" : "Get Started"}
               </AppButton>
-              <AppButton variant="ghost" className="text-white hover:bg-white/10 border border-white/20">
-                Update Pantry
-              </AppButton>
+              {!user && (
+                <AppButton
+                  variant="ghost"
+                  className="text-white hover:bg-white/10 border border-white/20 px-8 h-12 text-base"
+                  onClick={() => router.push('/login')}
+                >
+                  Sign In
+                </AppButton>
+              )}
             </div>
           </div>
           <ChefHat className="absolute -bottom-10 -right-10 h-72 w-72 text-green-500/20 rotate-12" aria-hidden />
@@ -83,9 +102,9 @@ export default function HomePage() {
         {/* Recommendations Section */}
         <section>
           <SectionHeader
-            title="Recommended for You"
-            subtitle="Based on your pantry ingredients"
-            action={<AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50">See all →</AppButton>}
+            title={user ? "Recommended for You" : "Trending Recipes"}
+            subtitle={user ? "Based on your pantry ingredients" : "Top picks for your next meal"}
+            action={<AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50" onClick={() => router.push('/recipes')}>See all →</AppButton>}
           />
           {isLoading ? (
             <RecipeGrid>
@@ -95,7 +114,7 @@ export default function HomePage() {
             </RecipeGrid>
           ) : (
             <RecipeGrid>
-              {recommendations?.items?.map((recipe) => (
+              {recommendations?.items?.slice(0, 4).map((recipe) => (
                 <RecipeCard key={recipe.id} {...recipe} />
               ))}
             </RecipeGrid>
@@ -107,7 +126,7 @@ export default function HomePage() {
           <SectionHeader
             title="Popular this Week"
             subtitle="Most cooked by the community"
-            action={<AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50">See all →</AppButton>}
+            action={<AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50" onClick={() => router.push('/recipes')}>See all →</AppButton>}
           />
           <RecipeGrid>
             {POPULAR_RECIPES.map((recipe) => (

@@ -9,19 +9,19 @@ import { RemoveRecipeFromCollectionUseCase } from './application/use-cases/remov
 import { DeleteCollectionUseCase } from './application/use-cases/delete-collection.use-case';
 
 @Module({
-    controllers: [CollectionsController],
-    providers: [
-        PrismaService,
-        {
-            provide: 'ICollectionRepository',
-            useClass: PrismaCollectionRepository,
-        },
-        GetCollectionsUseCase,
-        CreateCollectionUseCase,
-        AddRecipeToCollectionUseCase,
-        RemoveRecipeFromCollectionUseCase,
-        DeleteCollectionUseCase,
-    ],
-    exports: [GetCollectionsUseCase],
+  controllers: [CollectionsController],
+  providers: [
+    PrismaService,
+    {
+      provide: 'ICollectionRepository',
+      useClass: PrismaCollectionRepository,
+    },
+    GetCollectionsUseCase,
+    CreateCollectionUseCase,
+    AddRecipeToCollectionUseCase,
+    RemoveRecipeFromCollectionUseCase,
+    DeleteCollectionUseCase,
+  ],
+  exports: [GetCollectionsUseCase],
 })
-export class CollectionsModule { }
+export class CollectionsModule {}
