@@ -9,7 +9,7 @@ import {
 } from "@/shared/components/ui";
 
 interface RecipeCardProps {
-    id: string;
+    id: string | number;
     title: string;
     image: string;
     readyInMinutes: number;

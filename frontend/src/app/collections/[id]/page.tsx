@@ -3,11 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import {
     PageContainer,
-    SectionHeader,
     AppButton,
-    AppCard,
-    AppCardTitle,
-    AppCardContent
 } from "@/shared/components/ui";
 import { RecipeGrid, RecipeCard } from "@/features/recipes/components";
 import {
@@ -18,55 +14,20 @@ import {
     SortAsc,
     Plus
 } from "lucide-react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-
-const MOCK_COLLECTION = {
-    id: "1",
-    name: "Quick Weeknight Dinners",
-    recipeCount: 12,
-    recipes: [
-        {
-            id: '1',
-            title: 'Creamy Avocado Pasta',
-            image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&q=80&w=800',
-            readyInMinutes: 15,
-            servings: 2,
-            calories: 450,
-            matchPercentage: 90,
-        },
-        {
-            id: '2',
-            title: 'Garlic Butter Salmon',
-            image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&q=80&w=800',
-            readyInMinutes: 25,
-            servings: 2,
-            calories: 600,
-            matchPercentage: 75,
-        },
-        {
-            id: '4',
-            title: 'Spicy Tofu Stir Fry',
-            image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800',
-            readyInMinutes: 20,
-            servings: 3,
-            calories: 420,
-            matchPercentage: 85,
-        },
-    ]
-};
+import { useCollectionDetails } from "@/features/collections/api/collections";
+import { LoadingSkeleton } from "@/shared/components/feedback";
 
 export default function CollectionDetailsPage() {
     const params = useParams();
     const router = useRouter();
+    const id = params.id as string;
 
-    // Mock data for this example
-    const collection = MOCK_COLLECTION;
+    const { data: collection, isLoading, isError } = useCollectionDetails(id);
 
     return (
         <PageContainer
-            title={collection.name}
-            subtitle={`${collection.recipeCount} recipes saved here`}
+            title={isLoading ? "Loading Collection..." : collection?.name || "Collection"}
+            subtitle={collection ? `${collection.recipeCount} recipes saved here` : ""}
             action={
                 <div className="flex gap-2">
                     <AppButton variant="secondary" size="icon-sm">
@@ -100,7 +61,7 @@ export default function CollectionDetailsPage() {
                             <SortAsc className="h-4 w-4 mr-2" />
                             Sort
                         </AppButton>
-                        <AppButton size="sm">
+                        <AppButton size="sm" onClick={() => router.push("/recipes")}>
                             <Plus className="h-4 w-4 mr-1" />
                             Add Recipe
                         </AppButton>
@@ -108,13 +69,17 @@ export default function CollectionDetailsPage() {
                 </div>
 
                 {/* Recipes Grid */}
-                <RecipeGrid>
-                    {collection.recipes.map((recipe) => (
-                        <RecipeCard key={recipe.id} {...recipe} />
-                    ))}
-                </RecipeGrid>
-
-                {collection.recipes.length === 0 && (
+                {isLoading ? (
+                    <RecipeGrid>
+                        {[1, 2, 3, 4].map(i => <LoadingSkeleton key={i} variant="card" />)}
+                    </RecipeGrid>
+                ) : collection?.recipes && collection.recipes.length > 0 ? (
+                    <RecipeGrid>
+                        {collection.recipes.map((recipe: any) => (
+                            <RecipeCard key={recipe.id} {...recipe} />
+                        ))}
+                    </RecipeGrid>
+                ) : (
                     <div className="py-24 flex flex-col items-center justify-center text-center space-y-4 border border-dashed border-slate-200 rounded-[2.5rem]">
                         <div className="h-16 w-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
                             <Plus className="h-8 w-8" />

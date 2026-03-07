@@ -15,8 +15,11 @@ import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { Public } from '../../../../shared/decorators/public.decorator';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CurrentUser } from '../../../../shared/decorators/current-user.decorator';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { TokenResponseDto } from '../dto/token-response.dto';
+import { GetMeUseCase } from '../../application/use-cases/get-me.use-case';
+import { Get } from '@nestjs/common';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -26,6 +29,7 @@ export class AuthController {
         private readonly loginUseCase: LoginUseCase,
         private readonly refreshTokenUseCase: RefreshTokenUseCase,
         private readonly logoutUseCase: LogoutUseCase,
+        private readonly getMeUseCase: GetMeUseCase,
     ) { }
 
     @Public()
@@ -111,5 +115,14 @@ export class AuthController {
         await this.logoutUseCase.execute(currentRefreshToken);
 
         res.clearCookie('refreshToken');
+    }
+
+    @ApiBearerAuth('bearer')
+    @ApiOperation({ summary: 'Get current authenticated user info' })
+    @ApiResponse({ status: 200, description: 'User info retrieved.' })
+    @ApiResponse({ status: 401, description: 'Unauthorized.' })
+    @Get('me')
+    async me(@CurrentUser() userId: string) {
+        return this.getMeUseCase.execute(userId);
     }
 }

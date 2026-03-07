@@ -21,8 +21,14 @@ async function bootstrap() {
     }),
   );
 
+  const configService = app.get(ConfigService);
+  const frontendUrl = configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+
   // CORS for frontend
-  app.enableCors();
+  app.enableCors({
+    origin: [frontendUrl],
+    credentials: true,
+  });
 
   // Graceful shutdown
   app.enableShutdownHooks();
@@ -31,7 +37,6 @@ async function bootstrap() {
     .setTitle('Recipe Pantry API')
     .setDescription('API for Recipe Pantry App')
     .setVersion('1.0')
-    // якщо буде JWT:
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'bearer',
@@ -45,7 +50,6 @@ async function bootstrap() {
     SwaggerModule.setup('docs', app, document);
   }
 
-  const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3001;
 
   await app.listen(port);

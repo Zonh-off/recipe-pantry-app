@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { PageContainer, SectionHeader, AppButton, AppCard, AppCardContent } from "@/shared/components/ui";
-import { GroceryList, AddIngredient, GroceryItemType } from "@/features/grocery-list/components";
+import { PageContainer, AppButton, AppCard, AppCardContent } from "@/shared/components/ui";
+import { GroceryList, AddIngredient } from "@/features/grocery-list/components";
 import {
     Trash2,
     Share2,
@@ -13,37 +13,37 @@ import {
     CheckCircle2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const MOCK_GROCERY_ITEMS: GroceryItemType[] = [
-    { id: 1, name: "Roma Tomatoes", amount: "3 items", category: "Vegetables", completed: false, recipeName: "Creamy Avocado Pasta" },
-    { id: 2, name: "Fresh Basil", amount: "1/4 cup", category: "Herbs", completed: false, recipeName: "Creamy Avocado Pasta" },
-    { id: 3, name: "Cherry Tomatoes", amount: "100g", category: "Vegetables", completed: false, recipeName: "Creamy Avocado Pasta" },
-    { id: 4, name: "Spaghetti", amount: "500g", category: "Grains", completed: true, recipeName: "Creamy Avocado Pasta" },
-    { id: 5, name: "Milk", amount: "1L", category: "Dairy", completed: false },
-    { id: 6, name: "Eggs", amount: "6 pack", category: "Dairy", completed: false },
-];
+import {
+    useGroceryList,
+    useAddGroceryItem,
+    useToggleGroceryItem,
+    useRemoveGroceryItem,
+    useClearCompletedGroceryItems
+} from "@/features/grocery-list/api/grocery";
 
 export default function GroceryListPage() {
-    const [items, setItems] = useState(MOCK_GROCERY_ITEMS);
+    const { data: items = [], isLoading } = useGroceryList();
+    const addMutation = useAddGroceryItem();
+    const toggleMutation = useToggleGroceryItem();
+    const removeMutation = useRemoveGroceryItem();
+    const clearMutation = useClearCompletedGroceryItems();
+
     const [groupBy, setGroupBy] = useState<"category" | "recipe" | "none">("category");
 
     const handleToggle = (id: string | number) => {
-        setItems(items.map(item =>
-            item.id === id ? { ...item, completed: !item.completed } : item
-        ));
+        toggleMutation.mutate(id);
     };
 
     const handleRemove = (id: string | number) => {
-        setItems(items.filter(item => item.id !== id));
+        removeMutation.mutate(id);
     };
 
     const handleAddItem = (name: string) => {
-        const newId = Math.max(...items.map(i => Number(i.id))) + 1;
-        setItems([{ id: newId, name, completed: false }, ...items]);
+        addMutation.mutate(name);
     };
 
     const clearCompleted = () => {
-        setItems(items.filter(item => !item.completed));
+        clearMutation.mutate();
     };
 
     const completedCount = items.filter(i => i.completed).length;
@@ -52,7 +52,7 @@ export default function GroceryListPage() {
     return (
         <PageContainer
             title="Grocery List"
-            subtitle={`${items.length - completedCount} items left to buy`}
+            subtitle={isLoading ? "Loading your list..." : `${items.length - completedCount} items left to buy`}
             action={
                 <div className="flex gap-2">
                     <AppButton variant="secondary" size="icon-sm">
@@ -123,7 +123,8 @@ export default function GroceryListPage() {
                                         size="sm"
                                         className="justify-start text-slate-500 font-bold hover:text-rose-600 hover:bg-rose-50"
                                         onClick={clearCompleted}
-                                        disabled={completedCount === 0}
+                                        disabled={completedCount === 0 || clearMutation.isPending}
+                                        loading={clearMutation.isPending}
                                     >
                                         <Trash2 className="h-4 w-4 mr-2" />
                                         Clear completed
@@ -152,14 +153,20 @@ export default function GroceryListPage() {
                 <div className="lg:col-span-2 space-y-8">
                     <AddIngredient onAdd={handleAddItem} />
 
-                    <GroceryList
-                        items={items}
-                        onToggle={handleToggle}
-                        onRemove={handleRemove}
-                        groupBy={groupBy}
-                    />
+                    {isLoading ? (
+                        <div className="py-20 text-center text-slate-400 font-medium">
+                            Fetching your shopping list...
+                        </div>
+                    ) : (
+                        <GroceryList
+                            items={items}
+                            onToggle={handleToggle}
+                            onRemove={handleRemove}
+                            groupBy={groupBy}
+                        />
+                    )}
 
-                    {items.length === 0 && (
+                    {!isLoading && items.length === 0 && (
                         <div className="py-24 flex flex-col items-center justify-center text-center space-y-4 bg-white border border-dashed border-slate-200 rounded-[2.5rem] shadow-sm">
                             <div className="h-20 w-20 rounded-full bg-slate-50 flex items-center justify-center text-slate-200">
                                 <ShoppingCart className="h-10 w-10" />

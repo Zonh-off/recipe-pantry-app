@@ -20,53 +20,62 @@ import {
     AppCard,
     AppCardContent,
     AppBadge,
-    Chip
+    Chip,
+    Modal
 } from "@/shared/components/ui";
-import { IngredientList } from "@/features/recipes/components";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-
-// Mock data for a single recipe
-const MOCK_RECIPE = {
-    id: "1",
-    title: "Creamy Avocado Pasta",
-    description: "A quick, healthy, and incredibly creamy pasta dish made with fresh avocados, garlic, and a hint of lemon. Perfect for a busy weeknight dinner when you want something satisfying but nutritious.",
-    image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&q=80&w=1200",
-    readyInMinutes: 15,
-    servings: 2,
-    calories: 450,
-    matchPercentage: 90,
-    diets: ["Vegetarian", "Vegan Options", "Quick"],
-    cuisines: ["Italian-Fusion"],
-    ingredients: [
-        { id: 1, name: "Spaghetti", amount: "200g", status: "available" as const },
-        { id: 2, name: "Ripe Avocados", amount: "2 large", status: "available" as const },
-        { id: 3, name: "Garlic", amount: "2 cloves", status: "available" as const },
-        { id: 4, name: "Fresh Basil", amount: "1/4 cup", status: "missing" as const },
-        { id: 5, name: "Lemon Juice", amount: "1 tbsp", status: "available" as const },
-        { id: 6, name: "Olive Oil", amount: "2 tbsp", status: "available" as const },
-        { id: 7, name: "Cherry Tomatoes", amount: "100g", status: "missing" as const },
-    ],
-    instructions: [
-        "Bring a large pot of salted water to a boil. Add spaghetti and cook according to package directions until al dente.",
-        "While the pasta is cooking, prepare the sauce. Scoop the avocado flesh into a blender or food processor.",
-        "Add garlic, basil, lemon juice, and olive oil. Blend until smooth and creamy. If it's too thick, add a tablespoon of the pasta water.",
-        "Drain the pasta, reserving a small amount of extra pasta water.",
-        "Toss the pasta with the avocado sauce until well coated. If needed, add a splash of reserved pasta water to reach your desired consistency.",
-        "Fold in halved cherry tomatoes (if using) and season with salt and pepper to taste.",
-        "Serve immediately, garnished with extra basil leaves if desired."
-    ]
-};
+import { useRecipeDetails } from "@/features/recipes/api/recipes";
+import { LoadingSkeleton } from "@/shared/components/feedback";
+import { AddToCollectionModal } from "@/features/collections/components";
 
 export default function RecipeDetailsPage() {
     const params = useParams();
     const router = useRouter();
+    const id = params.id as string;
+
+    const { data: recipe, isLoading, isError } = useRecipeDetails(id);
     const [isSaved, setIsSaved] = useState(false);
 
-    // In a real app, we would fetch the recipe by ID
-    const recipe = MOCK_RECIPE;
+    if (isLoading) {
+        return (
+            <PageContainer title="Loading Recipe...">
+                <div className="space-y-8">
+                    <LoadingSkeleton variant="image" className="aspect-[21/9]" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="md:col-span-2 space-y-4">
+                            <LoadingSkeleton variant="text" className="h-10 w-2/3" />
+                            <LoadingSkeleton variant="text" />
+                            <LoadingSkeleton variant="text" />
+                        </div>
+                        <LoadingSkeleton variant="card" />
+                    </div>
+                </div>
+            </PageContainer>
+        );
+    }
 
-    const missingIngredients = recipe.ingredients.filter(i => i.status === "missing");
+    if (isError || !recipe) {
+        return (
+            <PageContainer title="Recipe Not Found">
+                <div className="py-20 text-center space-y-4">
+                    <p className="text-slate-500">We couldn't load the recipe details. It might have been removed or the ID is incorrect.</p>
+                    <AppButton onClick={() => router.push("/recipes")}>Back to Recipes</AppButton>
+                </div>
+            </PageContainer>
+        );
+    }
+
+    const diets = recipe.diets ?? [];
+    const cuisines = recipe.cuisines ?? [];
+    const ingredients = recipe.ingredients ?? [];
+    const instructions = Array.isArray(recipe.instructions)
+        ? recipe.instructions
+        : typeof recipe.instructions === 'string'
+            ? [recipe.instructions]
+            : [];
+
+    const missingIngredients = ingredients.filter(i => i.status === "missing");
 
     return (
         <PageContainer
@@ -98,9 +107,14 @@ export default function RecipeDetailsPage() {
                         <AppButton variant="outline" size="icon-sm" className="rounded-full shadow-sm">
                             <Share2 className="h-4 w-4 text-slate-400" />
                         </AppButton>
-                        <AppButton variant="outline" size="icon-sm" className="rounded-full shadow-sm">
-                            <Bookmark className="h-4 w-4 text-slate-400" />
-                        </AppButton>
+                        <AddToCollectionModal
+                            recipeId={recipe.id}
+                            trigger={
+                                <AppButton variant="outline" size="icon-sm" className="rounded-full shadow-sm">
+                                    <Bookmark className="h-4 w-4 text-slate-400" />
+                                </AppButton>
+                            }
+                        />
                     </div>
                 </div>
 
@@ -113,7 +127,7 @@ export default function RecipeDetailsPage() {
                             alt={recipe.title}
                             className="w-full h-full object-cover"
                         />
-                        {recipe.matchPercentage >= 90 && (
+                        {recipe.matchPercentage && recipe.matchPercentage >= 90 && (
                             <div className="absolute top-4 left-4">
                                 <AppBadge variant="primary" className="bg-green-600/90 backdrop-blur-md px-3 py-1 text-sm border-none shadow-lg">
                                     Perfect Match
@@ -125,10 +139,12 @@ export default function RecipeDetailsPage() {
                     {/* Right: Primary Info */}
                     <div className="space-y-6 pt-2">
                         <div className="flex flex-wrap gap-2 mb-2">
-                            {recipe.diets.map(diet => (
+                            {diets.map(diet => (
                                 <Chip key={diet} color="green" className="font-semibold">{diet}</Chip>
                             ))}
-                            <Chip color="sky" className="font-semibold">{recipe.cuisines[0]}</Chip>
+                            {cuisines.length > 0 && (
+                                <Chip color="sky" className="font-semibold">{cuisines[0]}</Chip>
+                            )}
                         </div>
 
                         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
@@ -136,7 +152,7 @@ export default function RecipeDetailsPage() {
                         </h1>
 
                         <p className="text-slate-500 text-lg leading-relaxed">
-                            {recipe.description}
+                            {recipe.summary ? recipe.summary.replace(/<[^>]*>?/gm, '') : 'No description available.'}
                         </p>
 
                         {/* Metadata Grid */}
@@ -159,17 +175,22 @@ export default function RecipeDetailsPage() {
                                 <div className="bg-rose-50 p-2 rounded-xl text-rose-600 mb-1">
                                     <Flame className="h-5 w-5" />
                                 </div>
-                                <span className="text-sm font-bold text-slate-900">{recipe.calories} kcal</span>
+                                <span className="text-sm font-bold text-slate-900">{recipe.calories || 0} kcal</span>
                                 <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Per saving</span>
                             </div>
                         </div>
 
                         {/* CTA Actions */}
                         <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                            <AppButton className="flex-1 h-12 shadow-lg shadow-green-600/20 text-base">
-                                <Bookmark className="h-5 w-5 mr-2" />
-                                Save to Collection
-                            </AppButton>
+                            <AddToCollectionModal
+                                recipeId={recipe.id}
+                                trigger={
+                                    <AppButton className="flex-1 h-12 shadow-lg shadow-green-600/20 text-base">
+                                        <Bookmark className="h-5 w-5 mr-2" />
+                                        Save to Collection
+                                    </AppButton>
+                                }
+                            />
                             {missingIngredients.length > 0 && (
                                 <AppButton variant="secondary" className="flex-1 h-12 border-slate-200">
                                     <ShoppingCart className="h-5 w-5 mr-2" />
@@ -187,12 +208,12 @@ export default function RecipeDetailsPage() {
                         <AppCard variant="flat" className="bg-slate-50/50 border-none rounded-3xl p-6">
                             <SectionHeader
                                 title="Ingredients"
-                                subtitle={`${recipe.ingredients.length} items needed`}
+                                subtitle={`${ingredients.length} items needed`}
                                 className="mb-6"
                             />
                             <div className="space-y-4">
-                                {recipe.ingredients.map(ingredient => (
-                                    <div key={ingredient.id} className="flex items-start gap-3 group">
+                                {ingredients.map((ingredient, idx) => (
+                                    <div key={idx} className="flex items-start gap-3 group">
                                         <div className={cn(
                                             "mt-1 p-0.5 rounded-full",
                                             ingredient.status === "available" ? "text-green-600" : "text-slate-300"
@@ -238,7 +259,7 @@ export default function RecipeDetailsPage() {
                     <div className="lg:col-span-2 space-y-6">
                         <SectionHeader title="Cooking Instructions" className="mb-6" />
                         <div className="space-y-8">
-                            {recipe.instructions.map((step, index) => (
+                            {instructions.length > 0 ? instructions.map((step, index) => (
                                 <div key={index} className="flex gap-6">
                                     <div className="shrink-0">
                                         <div className="h-10 w-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-sm font-black text-slate-900 shadow-sm">
@@ -251,7 +272,9 @@ export default function RecipeDetailsPage() {
                                         </p>
                                     </div>
                                 </div>
-                            ))}
+                            )) : (
+                                <p className="text-slate-500 italic">No instructions provided for this recipe.</p>
+                            )}
                         </div>
                     </div>
                 </div>

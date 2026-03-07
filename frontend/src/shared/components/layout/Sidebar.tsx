@@ -10,8 +10,10 @@ import {
     ShoppingCart,
     User,
     ChefHat,
+    LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/providers/auth-provider';
 
 const NAV_ITEMS = [
     { href: '/', label: 'Home', icon: Home },
@@ -22,12 +24,9 @@ const NAV_ITEMS = [
     { href: '/profile', label: 'Profile', icon: User },
 ] as const;
 
-/**
- * Sidebar – desktop left-side navigation (lg+ only).
- * Hidden on mobile; BottomNav handles mobile navigation.
- */
 export default function Sidebar() {
     const pathname = usePathname();
+    const { user, logout } = useAuth();
 
     return (
         <aside
@@ -66,11 +65,10 @@ export default function Sidebar() {
                                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                             )}
                         >
-                            {/* Active indicator pill */}
                             <span
                                 className={cn(
                                     'absolute left-0 h-6 w-1 rounded-r-full bg-green-600 transition-opacity duration-150',
-                                    isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-0'
+                                    isActive ? 'opacity-100' : 'opacity-0'
                                 )}
                             />
                             <Icon
@@ -85,9 +83,38 @@ export default function Sidebar() {
                 })}
             </nav>
 
-            {/* Footer */}
-            <div className="px-6 py-4 border-t border-slate-200">
-                <p className="text-xs text-slate-400">
+            {/* User Profile & Logout */}
+            <div className="p-4 border-t border-slate-200 space-y-3">
+                {user ? (
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-3 px-2">
+                            <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 uppercase">
+                                {user.name.charAt(0)}
+                            </div>
+                            <div className="flex flex-col overflow-hidden">
+                                <span className="text-sm font-bold text-slate-900 truncate">{user.name}</span>
+                                <span className="text-xs text-slate-500 truncate">{user.email}</span>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => logout()}
+                            className="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+                        >
+                            <LogOut className="h-4 w-4" />
+                            Sign Out
+                        </button>
+                    </div>
+                ) : (
+                    <Link
+                        href="/login"
+                        className="flex items-center gap-3 w-full rounded-xl px-3 py-2 text-sm font-bold text-green-600 hover:bg-green-50 transition-colors"
+                    >
+                        <User className="h-4 w-4" />
+                        Sign In
+                    </Link>
+                )}
+
+                <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase text-center pt-2">
                     © {new Date().getFullYear()} RecipePantry
                 </p>
             </div>

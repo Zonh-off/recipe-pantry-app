@@ -10,6 +10,7 @@ import { RegisterUseCase } from './application/use-cases/register.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
 import { LogoutUseCase } from './application/use-cases/logout.use-case';
+import { GetMeUseCase } from './application/use-cases/get-me.use-case';
 import { PrismaUserRepository } from './infrastructure/repositories/prisma-user.repository';
 import { PrismaRefreshTokenRepository } from './infrastructure/repositories/prisma-refresh-token.repository';
 import { AuthController } from './transport/controllers/auth.controller';
@@ -35,6 +36,7 @@ import { JwtStrategy } from '../../shared/strategies/jwt.strategy';
         LoginUseCase,
         RefreshTokenUseCase,
         LogoutUseCase,
+        GetMeUseCase,
         JwtStrategy,
         {
             provide: USER_REPOSITORY,

@@ -12,11 +12,8 @@ import {
     SectionHeader,
     Chip
 } from "@/shared/components/ui";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    User,
     ShieldAlert,
     Heart,
     Activity,
@@ -24,8 +21,9 @@ import {
     CheckCircle2,
     AlertCircle
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useProfile, useUpdateProfile } from "@/features/profile/api/profile";
 
 const profileSchema = z.object({
     diet: z.string().optional(),
@@ -46,27 +44,38 @@ const INTOLERANCES = ["Dairy", "Egg", "Gluten", "Peanut", "Seafood", "Sesame", "
 const CUISINES = ["Italian", "Mexican", "Asian", "Mediterranean", "American", "French", "Indian", "Greek", "Middle Eastern"];
 
 export default function ProfilePage() {
+    const { data: profile, isLoading } = useProfile();
+    const updateMutation = useUpdateProfile();
     const [success, setSuccess] = useState(false);
 
     const form = useForm<ProfileFormValues>({
         resolver: zodResolver(profileSchema) as any,
         defaultValues: {
-            diet: "Vegetarian",
-            intolerances: ["Peanut"],
-            cuisines: ["Italian", "Asian"],
+            diet: "",
+            intolerances: [],
+            cuisines: [],
             goals: {
-                calories: "2000",
-                protein: "100",
-                carbs: "250",
-                fat: "70",
+                calories: "",
+                protein: "",
+                carbs: "",
+                fat: "",
             },
         },
     });
 
+    useEffect(() => {
+        if (profile) {
+            form.reset(profile);
+        }
+    }, [profile, form]);
+
     const onSubmit = (data: ProfileFormValues) => {
-        console.log("Profile updated:", data);
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
+        updateMutation.mutate(data, {
+            onSuccess: () => {
+                setSuccess(true);
+                setTimeout(() => setSuccess(false), 3000);
+            }
+        });
     };
 
     const toggleArrayItem = (fieldName: "intolerances" | "cuisines", item: string) => {
@@ -80,7 +89,7 @@ export default function ProfilePage() {
     return (
         <PageContainer
             title="My Preferences"
-            subtitle="Customize your experience and filter results to match your needs."
+            subtitle={isLoading ? "Loading preferences..." : "Customize your experience and filter results to match your needs."}
             action={
                 <div className="flex items-center gap-3">
                     {success && (
@@ -91,7 +100,8 @@ export default function ProfilePage() {
                     )}
                     <AppButton
                         onClick={form.handleSubmit(onSubmit)}
-                        disabled={!form.formState.isDirty}
+                        disabled={!form.formState.isDirty || updateMutation.isPending}
+                        loading={updateMutation.isPending}
                         className="shadow-lg shadow-green-600/20"
                     >
                         <Save className="h-4 w-4 mr-2" />
