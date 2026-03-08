@@ -1,14 +1,9 @@
 {
-	"dependencies": {
-		"@nestjs/jwt": "^11.0.2",
-		"@nestjs/passport": "^11.0.5",
-		"bcrypt": "^6.0.0",
-		"next-auth": "^4.24.13",
-		"passport": "^0.7.0",
-		"passport-jwt": "^4.0.1"
-	},
-	"devDependencies": {
-		"@types/bcrypt": "^6.0.0",
-		"@types/passport-jwt": "^4.0.1"
+	"private": true,
+	"scripts": {
+		"dev:frontend": "pnpm --filter frontend dev",
+		"dev:backend": "pnpm --filter backend start:dev",
+		"build": "pnpm -r build",
+		"install:all": "pnpm install"
 	}
 }
