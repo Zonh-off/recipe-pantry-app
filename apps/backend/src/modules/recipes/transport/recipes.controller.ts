@@ -16,7 +16,7 @@ import {
 } from '../application/use-cases';
 import { SearchRecipesQueryDto } from './dto/search-recipes.query.dto';
 import { GetPopularQueryDto } from './dto/get-popular.query.dto';
-import { CurrentUser } from '@common/decorators';
+import { CurrentUser, Public } from '@common/decorators';
 import { CookFromPantryQueryDto } from './dto/cook-from-pantry.query.dto';
 
 @ApiBearerAuth('bearer')
@@ -30,7 +30,7 @@ export class RecipesController {
     private readonly getPopularUC: GetPopularRecipesUseCase,
     private readonly getCategoriesUC: GetCategoriesUseCase,
     private readonly getRecommendationsUC: GetRecommendationsUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Search for recipes with various filters' })
   @ApiQuery({
@@ -40,6 +40,7 @@ export class RecipesController {
     description: 'Search query string',
     required: false,
   })
+  @Public()
   @Get('search')
   search(@Query() query: SearchRecipesQueryDto) {
     return this.searchRecipes.execute({
@@ -56,6 +57,7 @@ export class RecipesController {
   }
 
   @ApiOperation({ summary: 'Get popular/trending recipes' })
+  @Public()
   @Get('popular')
   popular(@Query() query: GetPopularQueryDto) {
     return this.getPopularUC.execute({
@@ -65,6 +67,7 @@ export class RecipesController {
   }
 
   @ApiOperation({ summary: 'Get list of curated recipe categories' })
+  @Public()
   @Get('categories')
   categories() {
     return this.getCategoriesUC.execute();
@@ -73,6 +76,7 @@ export class RecipesController {
   @ApiOperation({
     summary: 'Get personalized recipe recommendations for the user',
   })
+  @Public()
   @Get('recommendations')
   recommendations(@CurrentUser() userId: string) {
     return this.getRecommendationsUC.execute({
@@ -88,6 +92,7 @@ export class RecipesController {
     example: 716429,
     description: 'Recipe ID',
   })
+  @Public()
   @Get(':id')
   details(@Param('id') id: string) {
     return this.getDetails.execute(Number(id));

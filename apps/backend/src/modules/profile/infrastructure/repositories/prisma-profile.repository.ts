@@ -5,9 +5,10 @@ import { ProfileEntity } from '../../domain/entities/profile.entity';
 
 @Injectable()
 export class PrismaProfileRepository implements IProfileRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findByUserId(userId: string): Promise<ProfileEntity | null> {
+    if (!userId) return null;
     const row = await this.prisma.profile.findUnique({
       where: { userId },
     });

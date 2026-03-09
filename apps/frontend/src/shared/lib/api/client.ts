@@ -14,20 +14,5 @@ const apiClient = axios.create({
     },
 });
 
-/* ─── Response interceptor – normalise errors ─────────────────── */
-apiClient.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        const status: number = error.response?.status ?? 0;
-        const message: string =
-            error.response?.data?.message ??
-            error.response?.data?.error ??
-            error.message ??
-            'An unexpected error occurred.';
-
-        // Return a normalised error shape instead of the raw Axios error.
-        return Promise.reject({ status, message });
-    }
-);
-
+// Standard Axios instance. Interceptors are added in the AuthProvider to handle token management.
 export default apiClient;

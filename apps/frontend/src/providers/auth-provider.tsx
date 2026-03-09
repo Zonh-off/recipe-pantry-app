@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { User, authApi } from '@/features/auth/api/auth';
 import { useRouter, usePathname } from 'next/navigation';
 import apiClient from '@/shared/lib/api/client';
+import { getErrorMessage } from '@/shared/lib/api/error-utils';
 
 interface AuthContextType {
     user: User | null;
@@ -24,19 +25,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const pathname = usePathname();
 
     const checkAuth = useCallback(async () => {
+        // Skip refresh ping if we definitely know the user is unauthenticated
+        const authStatus = typeof window !== 'undefined' ? localStorage.getItem('v1_auth_status') : null;
+        if (authStatus === 'unauthenticated') {
+            setIsLoading(false);
+            return;
+        }
+
         try {
             // Try to refresh token first to see if we have a valid session
             const { accessToken: newAccessToken } = await authApi.refresh();
             setAccessToken(newAccessToken);
 
             // Now get user info
-            // We need to make sure the apiClient uses the new token
-            // For now, we manually set it or rely on the interceptor we'll add
             const me = await authApi.getMe();
             setUser(me);
+            localStorage.setItem('v1_auth_status', 'authenticated');
         } catch (error) {
             setUser(null);
             setAccessToken(null);
+            localStorage.setItem('v1_auth_status', 'unauthenticated');
         } finally {
             setIsLoading(false);
         }
@@ -65,17 +73,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const responseInterceptor = apiClient.interceptors.response.use(
             (response) => response,
             async (error) => {
-                const originalRequest = error.config;
-                if (error.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/auth/refresh')) {
+                const originalRequest = error?.config;
+                const status = error?.response?.status;
+
+                if (status === 401 && originalRequest && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
                     originalRequest._retry = true;
                     try {
                         const { accessToken: newAccessToken } = await authApi.refresh();
                         setAccessToken(newAccessToken);
+                        localStorage.setItem('v1_auth_status', 'authenticated');
                         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                         return apiClient(originalRequest);
                     } catch (refreshError) {
                         setUser(null);
                         setAccessToken(null);
+                        localStorage.setItem('v1_auth_status', 'unauthenticated');
                         return Promise.reject(refreshError);
                     }
                 }
@@ -89,24 +101,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const login = async (credentials: any) => {
-        const res = await authApi.login(credentials);
-        // Backend returns { accessToken }. We might need to fetch user.
-        setAccessToken(res.accessToken);
-        const me = await authApi.getMe();
-        setUser(me);
-        router.push('/pantry');
+        try {
+            const res = await authApi.login(credentials);
+            // Backend returns { accessToken }. We might need to fetch user.
+            setAccessToken(res.accessToken);
+            localStorage.setItem('v1_auth_status', 'authenticated');
+            const me = await authApi.getMe();
+            setUser(me);
+            router.push('/pantry');
+        } catch (error) {
+            throw new Error(getErrorMessage(error));
+        }
     };
 
     const register = async (details: any) => {
-        await authApi.register(details);
-        // Auto login or redirect to login
-        router.push('/login');
+        try {
+            await authApi.register(details);
+            router.push('/login');
+        } catch (error) {
+            throw new Error(getErrorMessage(error));
+        }
     };
 
     const logout = async () => {
         await authApi.logout();
         setUser(null);
         setAccessToken(null);
+        localStorage.setItem('v1_auth_status', 'unauthenticated');
         router.push('/login');
     };
 

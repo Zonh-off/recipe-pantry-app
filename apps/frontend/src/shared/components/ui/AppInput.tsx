@@ -16,8 +16,8 @@
 
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import type { ComponentProps } from 'react';
-import type { ReactNode } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 type AppInputProps = ComponentProps<'input'> & {
     /** Accessible label rendered above the input */
@@ -40,8 +40,13 @@ export function AppInput({
     icon,
     trailingElement,
     id,
+    type,
     ...props
 }: AppInputProps) {
+    const [showPassword, setShowPassword] = useState(false);
+    const isPassword = type === 'password';
+    const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
+
     const inputId = id ?? (label ? label.toLowerCase().replaceAll(' ', '-') : undefined);
 
     return (
@@ -64,6 +69,7 @@ export function AppInput({
 
                 <Input
                     id={inputId}
+                    type={inputType}
                     data-slot="app-input"
                     aria-invalid={!!error}
                     aria-describedby={
@@ -79,7 +85,7 @@ export function AppInput({
                         'focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20',
                         // Icon adjustments
                         icon ? 'pl-9' : '',
-                        trailingElement ? 'pr-9' : '',
+                        trailingElement || isPassword ? 'pr-9' : '',
                         // Error state
                         error
                             ? 'border-rose-400 focus-visible:border-rose-400 focus-visible:ring-rose-400/20'
@@ -89,11 +95,24 @@ export function AppInput({
                     {...props}
                 />
 
-                {trailingElement && (
+                {trailingElement ? (
                     <span className="absolute right-3 text-slate-400">
                         {trailingElement}
                     </span>
-                )}
+                ) : isPassword ? (
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 text-slate-400 hover:text-slate-600 focus:outline-none focus:text-green-600 transition-colors"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                        {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                        ) : (
+                            <Eye className="h-4 w-4" />
+                        )}
+                    </button>
+                ) : null}
             </div>
 
             {error && (

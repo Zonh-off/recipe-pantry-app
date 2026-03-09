@@ -5,15 +5,7 @@ import { IRecipesRepository } from '../../../domain/interfaces/recipes-repositor
 
 @Injectable()
 export class MockRecipesRepository implements IRecipesRepository {
-  private fixturesDir = join(
-    process.cwd(),
-    'src',
-    'modules',
-    'recipes',
-    'infrastructure',
-    'mock',
-    'fixtures',
-  );
+  private fixturesDir = join(__dirname, 'fixtures');
 
   async search(params: any) {
     // You can branch by params.query if you want later

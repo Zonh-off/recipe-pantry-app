@@ -27,9 +27,13 @@ export class GetRecommendationsUseCase {
 
     @Inject(PROFILE_REPOSITORY)
     private readonly profileRepo: IProfileRepository,
-  ) {}
+  ) { }
 
   async execute(params: RecommendParams): Promise<SearchRecipesResult> {
+    if (!params.userId) {
+      return this.provider.getRecommendations(params);
+    }
+
     const cached = await this.cache.getRecommendations(params.userId);
     if (cached) return cached;
 
