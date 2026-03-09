@@ -7,7 +7,7 @@ import { GetCategoriesUseCase } from './application/use-cases/get-categories.use
 import { GetRecommendationsUseCase } from './application/use-cases/get-recommendations.use-case';
 import { SpoonacularClient } from './infrastructure/spoonacular/spoonacular.client';
 import { RecipesCache } from './infrastructure/cache/recipes-cache';
-import { CacheModule } from '../../shared/cache/cache.module';
+import { CacheModule } from '../../core/cache/cache.module';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { MockRecipesProvider } from './infrastructure/mock/mock-recipes.provider';
 import { CookFromPantryUseCase } from './application/use-cases/cook-from-pantry.use-case';
@@ -49,4 +49,4 @@ import { ProfileModule } from '../profile/profile.module';
   ],
   exports: [],
 })
-export class RecipesModule {}
+export class RecipesModule { }

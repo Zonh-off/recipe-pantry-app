@@ -3,11 +3,11 @@ import {
   IProfileRepository,
   Profile,
 } from '../../domain/profile.repository.interface';
-import { PrismaService } from '../../../../shared/database/prisma.service';
+import { PrismaService } from '../../../../core/database/prisma.service';
 
 @Injectable()
 export class PrismaProfileRepository implements IProfileRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findByUserId(userId: string): Promise<Profile | null> {
     const row = await this.prisma.profile.findUnique({

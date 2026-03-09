@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../../shared/database/prisma.service';
+import { PrismaService } from '../../core/database/prisma.service';
 import { CollectionsController } from './transport/collections.controller';
 import { PrismaCollectionRepository } from './infrastructure/repositories-impl/prisma-collection.repository';
 import { GetCollectionsUseCase } from './application/use-cases/get-collections.use-case';
@@ -24,4 +24,4 @@ import { DeleteCollectionUseCase } from './application/use-cases/delete-collecti
   ],
   exports: [GetCollectionsUseCase],
 })
-export class CollectionsModule {}
+export class CollectionsModule { }

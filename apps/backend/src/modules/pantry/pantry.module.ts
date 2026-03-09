@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PantryController } from './transport/controllers/pantry.controller';
-import { PrismaService } from '../../shared/database/prisma.service';
+import { PrismaService } from '../../core/database/prisma.service';
 import { PrismaPantryRepository } from './infrastructure/repositories-impl/prisma-pantry.repository';
 import { MockIngredientService } from './infrastructure/adapters-impl/mock-ingredient.service';
 import { AddPantryItemUseCase } from './application/use-cases/add-pantry-item.use-case';
@@ -36,4 +36,4 @@ import { GetPantrySuggestionsUseCase } from './application/use-cases/get-pantry-
     GetPantrySuggestionsUseCase,
   ],
 })
-export class PantryModule {}
+export class PantryModule { }

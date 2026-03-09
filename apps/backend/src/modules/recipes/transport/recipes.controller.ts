@@ -15,7 +15,7 @@ import { GetPopularRecipesUseCase } from '../application/use-cases/get-popular-r
 import { GetCategoriesUseCase } from '../application/use-cases/get-categories.use-case';
 import { GetRecommendationsUseCase } from '../application/use-cases/get-recommendations.use-case';
 import { GetPopularQueryDto } from './dto/get-popular.query.dto';
-import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Recipes')
@@ -28,7 +28,7 @@ export class RecipesController {
     private readonly getPopularUC: GetPopularRecipesUseCase,
     private readonly getCategoriesUC: GetCategoriesUseCase,
     private readonly getRecommendationsUC: GetRecommendationsUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Search for recipes with various filters' })
   @ApiQuery({

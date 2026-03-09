@@ -3,11 +3,11 @@ import {
   ICollectionRepository,
   Collection,
 } from '../../domain/collection.repository.interface';
-import { PrismaService } from '../../../../shared/database/prisma.service';
+import { PrismaService } from '../../../../core/database/prisma.service';
 
 @Injectable()
 export class PrismaCollectionRepository implements ICollectionRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(data: Partial<Collection>): Promise<Collection> {
     const row = await this.prisma.collection.create({

@@ -20,7 +20,7 @@ import { UpdatePantryItemUseCase } from '../../application/use-cases/update-pant
 import { GetPantrySuggestionsUseCase } from '../../application/use-cases/get-pantry-suggestions.use-case';
 import { AddPantryItemDto } from '../dto/add-pantry-item.dto';
 import { UpdatePantryItemDto } from '../dto/update-pantry-item.dto';
-import { CurrentUser } from '../../../../shared/decorators/current-user.decorator';
+import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Pantry')
@@ -32,7 +32,7 @@ export class PantryController {
     private readonly removePantryItemUseCase: RemovePantryItemUseCase,
     private readonly updatePantryItemUseCase: UpdatePantryItemUseCase,
     private readonly getSuggestionsUC: GetPantrySuggestionsUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Get suggestions for common pantry items' })
   @Get('suggestions')

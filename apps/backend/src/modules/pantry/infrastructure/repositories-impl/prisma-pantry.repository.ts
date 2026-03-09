@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { IPantryRepository } from '../../domain/repositories/pantry-repository.interface';
-import { PrismaService } from '../../../../shared/database/prisma.service';
+import { PrismaService } from '../../../../core/database/prisma.service';
 import { PantryItem } from '../../domain/entities/pantry-item.entity';
 
 @Injectable()
 export class PrismaPantryRepository implements IPantryRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async addItem(item: Partial<PantryItem>): Promise<PantryItem> {
     const created = await this.prisma.pantryItem.create({

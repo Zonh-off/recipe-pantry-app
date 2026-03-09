@@ -26,7 +26,7 @@ import {
   UpdateGroceryItemDto,
   BulkAddItemDto,
 } from './dto/grocery.dto';
-import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Grocery')
@@ -39,7 +39,7 @@ export class GroceryController {
     private readonly removeItemUC: RemoveGroceryItemUseCase,
     private readonly clearCheckedUC: ClearCheckedItemsUseCase,
     private readonly bulkAddUC: GenerateGroceryFromRecipeUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({
     summary:

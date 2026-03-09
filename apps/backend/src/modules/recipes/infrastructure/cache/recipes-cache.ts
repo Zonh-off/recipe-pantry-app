@@ -7,7 +7,7 @@ import {
   RecipeDetails,
   SearchRecipesResult,
 } from '../../domain/ports/i-recipes-provider.port';
-import type { ICacheService } from '../../../../shared/cache/cache-service.interface';
+import type { ICacheService } from '../../../../core/cache/cache-service.interface';
 
 @Injectable()
 export class RecipesCache implements IRecipesCachePort {
@@ -17,7 +17,7 @@ export class RecipesCache implements IRecipesCachePort {
   constructor(
     @Inject('ICacheService')
     private readonly cache: ICacheService,
-  ) {}
+  ) { }
 
   async getSearch(keyObj: unknown): Promise<SearchRecipesResult | null> {
     const key = this.searchKey(keyObj);

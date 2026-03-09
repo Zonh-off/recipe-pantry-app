@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../../shared/database/prisma.service';
+import { PrismaService } from '../../../../core/database/prisma.service';
 import {
   GroceryItem,
   IGroceryRepository,
@@ -9,7 +9,7 @@ import { GroceryItem as PrismaGroceryItem } from '@prisma/client';
 
 @Injectable()
 export class PrismaGroceryRepository implements IGroceryRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findByUserId(userId: string): Promise<GroceryItem[]> {
     const items = await this.prisma.groceryItem.findMany({

@@ -7,7 +7,7 @@ import { UpdateGroceryItemUseCase } from './application/use-cases/update-grocery
 import { RemoveGroceryItemUseCase } from './application/use-cases/remove-grocery-item.use-case';
 import { ClearCheckedItemsUseCase } from './application/use-cases/clear-checked-items.use-case';
 import { GenerateGroceryFromRecipeUseCase } from './application/use-cases/generate-grocery-from-recipe.use-case';
-import { PrismaService } from '../../shared/database/prisma.service';
+import { PrismaService } from '../../core/database/prisma.service';
 
 @Module({
   controllers: [GroceryController],
@@ -26,4 +26,4 @@ import { PrismaService } from '../../shared/database/prisma.service';
   ],
   exports: [AddGroceryItemUseCase, GenerateGroceryFromRecipeUseCase],
 })
-export class GroceryModule {}
+export class GroceryModule { }

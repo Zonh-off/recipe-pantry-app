@@ -14,8 +14,8 @@ import { RefreshTokenUseCase } from '../../application/use-cases/refresh-token.u
 import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
-import { Public } from '../../../../shared/decorators/public.decorator';
-import { CurrentUser } from '../../../../shared/decorators/current-user.decorator';
+import { Public } from '../../../../common/decorators/public.decorator';
+import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -35,7 +35,7 @@ export class AuthController {
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
     private readonly getMeUseCase: GetMeUseCase,
-  ) {}
+  ) { }
 
   @Public()
   @ApiOperation({ summary: 'Register a new user' })

@@ -12,7 +12,7 @@ import { AddRecipeToCollectionUseCase } from '../application/use-cases/add-recip
 import { RemoveRecipeFromCollectionUseCase } from '../application/use-cases/remove-recipe-from-collection.use-case';
 import { DeleteCollectionUseCase } from '../application/use-cases/delete-collection.use-case';
 import { CreateCollectionDto } from './dto/create-collection.dto';
-import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Collections')
@@ -24,7 +24,7 @@ export class CollectionsController {
     private readonly addRecipe: AddRecipeToCollectionUseCase,
     private readonly removeRecipe: RemoveRecipeFromCollectionUseCase,
     private readonly deleteCollectionUC: DeleteCollectionUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'List all recipe collections for the current user' })
   @Get()

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { DatabaseModule } from '../../shared/database/database.module';
+import { DatabaseModule } from '../../core/database/database.module';
 import { USER_REPOSITORY } from './domain/repositories/user.repository.interface';
 import { REFRESH_TOKEN_REPOSITORY } from './domain/repositories/refresh-token.repository.interface';
 import { PasswordService } from './domain/services/password.service';
@@ -14,7 +14,7 @@ import { GetMeUseCase } from './application/use-cases/get-me.use-case';
 import { PrismaUserRepository } from './infrastructure/repositories/prisma-user.repository';
 import { PrismaRefreshTokenRepository } from './infrastructure/repositories/prisma-refresh-token.repository';
 import { AuthController } from './transport/controllers/auth.controller';
-import { JwtStrategy } from '../../shared/strategies/jwt.strategy';
+import { JwtStrategy } from '../../common/strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -49,4 +49,4 @@ import { JwtStrategy } from '../../shared/strategies/jwt.strategy';
   ],
   exports: [JwtModule, TokenService],
 })
-export class AuthModule {}
+export class AuthModule { }
