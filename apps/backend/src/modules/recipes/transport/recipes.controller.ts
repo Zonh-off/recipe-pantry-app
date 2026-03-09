@@ -1,7 +1,4 @@
 import { Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { SearchRecipesQueryDto } from './dto/search-recipes.query.dto';
-import { SearchRecipesUseCase } from '../application/use-cases/search-recipes.use-case';
-import { GetRecipeDetailsUseCase } from '../application/use-cases/get-recipe-details.use-case';
 import {
   ApiParam,
   ApiQuery,
@@ -9,13 +6,18 @@ import {
   ApiOperation,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CookFromPantryQueryDto } from './dto/cook-from-pantry.query.dto';
-import { CookFromPantryUseCase } from '../application/use-cases/cook-from-pantry.use-case';
-import { GetPopularRecipesUseCase } from '../application/use-cases/get-popular-recipes.use-case';
-import { GetCategoriesUseCase } from '../application/use-cases/get-categories.use-case';
-import { GetRecommendationsUseCase } from '../application/use-cases/get-recommendations.use-case';
+import {
+  CookFromPantryUseCase,
+  GetCategoriesUseCase,
+  GetPopularRecipesUseCase,
+  GetRecipeDetailsUseCase,
+  GetRecommendationsUseCase,
+  SearchRecipesUseCase,
+} from '../application/use-cases';
+import { SearchRecipesQueryDto } from './dto/search-recipes.query.dto';
 import { GetPopularQueryDto } from './dto/get-popular.query.dto';
-import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { CurrentUser } from '@common/decorators';
+import { CookFromPantryQueryDto } from './dto/cook-from-pantry.query.dto';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Recipes')
@@ -28,7 +30,7 @@ export class RecipesController {
     private readonly getPopularUC: GetPopularRecipesUseCase,
     private readonly getCategoriesUC: GetCategoriesUseCase,
     private readonly getRecommendationsUC: GetRecommendationsUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'Search for recipes with various filters' })
   @ApiQuery({

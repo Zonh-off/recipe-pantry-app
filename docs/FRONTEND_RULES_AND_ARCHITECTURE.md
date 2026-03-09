@@ -162,7 +162,7 @@ Forbidden in `shared/`:
 
 * Recipe-specific components
 * Pantry-specific logic
-* Collection-specific hooks
+* CollectionEntity-specific hooks
 * Feature business rules
 
 If code contains product meaning, it does not belong in `shared/`.
@@ -455,7 +455,7 @@ Purpose:
 * check/uncheck items
 * manual edits
 
-## Profile
+## ProfileEntity
 
 Purpose:
 
@@ -610,7 +610,7 @@ Example:
 * Recipes
 * Collections
 * Grocery List
-* Profile
+* ProfileEntity
 
 ### Mobile
 
@@ -622,7 +622,7 @@ Example:
 * Pantry
 * Search
 * Collections
-* Profile
+* ProfileEntity
 
 Rules:
 

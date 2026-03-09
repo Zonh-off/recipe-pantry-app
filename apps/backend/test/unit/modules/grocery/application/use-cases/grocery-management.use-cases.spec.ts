@@ -4,7 +4,8 @@ import { AddGroceryItemUseCase } from '../../../../../../src/modules/grocery/app
 import { UpdateGroceryItemUseCase } from '../../../../../../src/modules/grocery/application/use-cases/update-grocery-item.use-case';
 import { RemoveGroceryItemUseCase } from '../../../../../../src/modules/grocery/application/use-cases/remove-grocery-item.use-case';
 import { NotFoundException } from '@nestjs/common';
-import { GroceryItem } from '../../../../../../src/modules/grocery/domain/grocery.repository.interface';
+
+import {GroceryItemEntity} from "@modules/grocery/domain/entities/grocery-item.entity";
 
 describe('GroceryManagementUseCases', () => {
   let repo: any;

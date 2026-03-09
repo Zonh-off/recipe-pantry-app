@@ -1,18 +1,22 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { CacheModule } from '@core/cache/cache.module';
+import { PantryModule } from '@modules/pantry/pantry.module';
+import { ProfileModule } from '@modules/profile/profile.module';
 import { RecipesController } from './transport/recipes.controller';
-import { SearchRecipesUseCase } from './application/use-cases/search-recipes.use-case';
-import { GetRecipeDetailsUseCase } from './application/use-cases/get-recipe-details.use-case';
-import { GetPopularRecipesUseCase } from './application/use-cases/get-popular-recipes.use-case';
-import { GetCategoriesUseCase } from './application/use-cases/get-categories.use-case';
-import { GetRecommendationsUseCase } from './application/use-cases/get-recommendations.use-case';
-import { SpoonacularClient } from './infrastructure/spoonacular/spoonacular.client';
-import { RecipesCache } from './infrastructure/cache/recipes-cache';
-import { CacheModule } from '../../core/cache/cache.module';
-import { HttpModule, HttpService } from '@nestjs/axios';
-import { MockRecipesProvider } from './infrastructure/mock/mock-recipes.provider';
-import { CookFromPantryUseCase } from './application/use-cases/cook-from-pantry.use-case';
-import { PantryModule } from '../pantry/pantry.module';
-import { ProfileModule } from '../profile/profile.module';
+import {
+  CookFromPantryUseCase,
+  GetCategoriesUseCase,
+  GetPopularRecipesUseCase,
+  GetRecipeDetailsUseCase,
+  GetRecommendationsUseCase,
+  SearchRecipesUseCase,
+} from './application/use-cases';
+import { RECIPES_CACHE_REPOSITORY } from './domain/interfaces/recipes-cache-repository.interface';
+import { RecipesCacheRepository } from './infrastructure/repositories/cache/recipes-cache.repository';
+import { MockRecipesRepository } from './infrastructure/repositories/mock/mock-recipes.repository';
+import { SpoonacularRepository } from './infrastructure/repositories/spoonacular/spoonacular.repository';
+import { RECIPES_REPOSITORY } from '@modules/recipes/domain/interfaces/recipes-repository.interface';
 
 @Module({
   imports: [HttpModule, CacheModule, PantryModule, ProfileModule],
@@ -27,26 +31,29 @@ import { ProfileModule } from '../profile/profile.module';
 
     // Cache adapter (feature-level)
     {
-      provide: 'IRecipesCachePort',
-      useClass: RecipesCache,
+      provide: RECIPES_CACHE_REPOSITORY,
+      useClass: RecipesCacheRepository,
     },
 
     // External provider adapter
-    MockRecipesProvider,
-    SpoonacularClient,
+    MockRecipesRepository,
+    SpoonacularRepository,
 
-    // ✅ switch provider without "new"
+    // switch provider without "new"
     {
-      provide: 'IRecipesProviderPort',
-      useFactory: (mock: MockRecipesProvider, spoon: SpoonacularClient) => {
+      provide: RECIPES_REPOSITORY,
+      useFactory: (
+        mock: MockRecipesRepository,
+        spoon: SpoonacularRepository,
+      ) => {
         const mode = (
           process.env.RECIPES_PROVIDER_MODE ?? 'spoonacular'
         ).toLowerCase();
         return mode === 'mock' ? mock : spoon;
       },
-      inject: [MockRecipesProvider, SpoonacularClient],
+      inject: [MockRecipesRepository, SpoonacularRepository],
     },
   ],
   exports: [],
 })
-export class RecipesModule { }
+export class RecipesModule {}

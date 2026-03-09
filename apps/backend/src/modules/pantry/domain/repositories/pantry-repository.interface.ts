@@ -1,5 +1,7 @@
 import { PantryItem } from '../entities/pantry-item.entity';
 
+export const PANTRY_REPOSITORY = Symbol('PANTRY_REPOSITORY');
+
 export interface IPantryRepository {
   addItem(item: Partial<PantryItem>): Promise<PantryItem>;
   updateItem(id: string, item: Partial<PantryItem>): Promise<PantryItem>;

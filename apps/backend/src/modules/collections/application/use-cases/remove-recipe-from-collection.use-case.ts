@@ -1,13 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import type {
-  ICollectionRepository,
-  Collection,
-} from '../../domain/collection.repository.interface';
+import {
+  COLLECTION_REPOSITORY,
+  type ICollectionRepository,
+} from '../../domain/repositories/collection.repository.interface';
+import { CollectionEntity } from '@modules/collections/domain/entities/collection.entity';
 
 @Injectable()
 export class RemoveRecipeFromCollectionUseCase {
   constructor(
-    @Inject('ICollectionRepository')
+    @Inject(COLLECTION_REPOSITORY)
     private readonly repo: ICollectionRepository,
   ) {}
 
@@ -15,10 +16,10 @@ export class RemoveRecipeFromCollectionUseCase {
     userId: string,
     collectionId: string,
     recipeId: number,
-  ): Promise<Collection> {
+  ): Promise<CollectionEntity> {
     const col = await this.repo.findById(collectionId);
     if (!col || col.userId !== userId) {
-      throw new NotFoundException('Collection not found');
+      throw new NotFoundException('CollectionEntity not found');
     }
 
     if (!col.recipeIds.includes(recipeId)) {

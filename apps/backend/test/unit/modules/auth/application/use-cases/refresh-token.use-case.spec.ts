@@ -4,7 +4,7 @@ import {
   REFRESH_TOKEN_REPOSITORY,
   IRefreshTokenRepository,
 } from '../../../../../../src/modules/auth/domain/repositories/refresh-token.repository.interface';
-import { TokenService } from '../../../../../../src/modules/auth/domain/services/token.service';
+import { TokenService } from '../../../../../../src/modules/auth/infrastructure/services/token.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { RefreshToken } from '../../../../../../src/modules/auth/domain/entities/refresh-token.entity';
 

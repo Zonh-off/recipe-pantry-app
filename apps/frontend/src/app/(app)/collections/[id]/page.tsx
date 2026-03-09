@@ -26,7 +26,7 @@ export default function CollectionDetailsPage() {
 
     return (
         <PageContainer
-            title={isLoading ? "Loading Collection..." : collection?.name || "Collection"}
+            title={isLoading ? "Loading CollectionEntity..." : collection?.name || "Collection"}
             subtitle={collection ? `${collection.recipeCount} recipes saved here` : ""}
             action={
                 <div className="flex gap-2">

@@ -183,7 +183,7 @@ Mobile navigation items:
 - Pantry
 - Search
 - Collections
-- Profile
+- ProfileEntity
 
 Rules:
 
@@ -374,8 +374,8 @@ This screen should prioritize usability over visual richness.
 
 ---
 
-## 7.7 Profile / Preferences
-Profile screen should be simple and structured.
+## 7.7 ProfileEntity / Preferences
+ProfileEntity screen should be simple and structured.
 
 Use:
 - grouped form sections

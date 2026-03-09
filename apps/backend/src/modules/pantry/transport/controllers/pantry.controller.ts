@@ -13,14 +13,16 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { AddPantryItemUseCase } from '../../application/use-cases/add-pantry-item.use-case';
-import { GetPantryItemsUseCase } from '../../application/use-cases/get-pantry-items.use-case';
-import { RemovePantryItemUseCase } from '../../application/use-cases/remove-pantry-item.use-case';
-import { UpdatePantryItemUseCase } from '../../application/use-cases/update-pantry-item.use-case';
-import { GetPantrySuggestionsUseCase } from '../../application/use-cases/get-pantry-suggestions.use-case';
+import {
+  AddPantryItemUseCase,
+  GetPantryItemsUseCase,
+  GetPantrySuggestionsUseCase,
+  RemovePantryItemUseCase,
+  UpdatePantryItemUseCase,
+} from '../../application/use-cases';
+import { CurrentUser } from '@common/decorators';
 import { AddPantryItemDto } from '../dto/add-pantry-item.dto';
 import { UpdatePantryItemDto } from '../dto/update-pantry-item.dto';
-import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Pantry')
@@ -32,7 +34,7 @@ export class PantryController {
     private readonly removePantryItemUseCase: RemovePantryItemUseCase,
     private readonly updatePantryItemUseCase: UpdatePantryItemUseCase,
     private readonly getSuggestionsUC: GetPantrySuggestionsUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'Get suggestions for common pantry items' })
   @Get('suggestions')

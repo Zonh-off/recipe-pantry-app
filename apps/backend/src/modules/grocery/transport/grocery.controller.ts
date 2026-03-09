@@ -15,18 +15,20 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { GetGroceryListUseCase } from '../application/use-cases/get-grocery-list.use-case';
-import { AddGroceryItemUseCase } from '../application/use-cases/add-grocery-item.use-case';
-import { UpdateGroceryItemUseCase } from '../application/use-cases/update-grocery-item.use-case';
-import { RemoveGroceryItemUseCase } from '../application/use-cases/remove-grocery-item.use-case';
-import { ClearCheckedItemsUseCase } from '../application/use-cases/clear-checked-items.use-case';
-import { GenerateGroceryFromRecipeUseCase } from '../application/use-cases/generate-grocery-from-recipe.use-case';
 import {
+  AddGroceryItemUseCase,
+  ClearCheckedItemsUseCase,
+  GenerateGroceryFromRecipeUseCase,
+  GetGroceryListUseCase,
+  RemoveGroceryItemUseCase,
+  UpdateGroceryItemUseCase,
+} from '../application/use-cases';
+import {
+  BulkAddItemDto,
   CreateGroceryItemDto,
   UpdateGroceryItemDto,
-  BulkAddItemDto,
 } from './dto/grocery.dto';
-import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { CurrentUser } from '@common/decorators';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Grocery')
@@ -39,7 +41,7 @@ export class GroceryController {
     private readonly removeItemUC: RemoveGroceryItemUseCase,
     private readonly clearCheckedUC: ClearCheckedItemsUseCase,
     private readonly bulkAddUC: GenerateGroceryFromRecipeUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({
     summary:

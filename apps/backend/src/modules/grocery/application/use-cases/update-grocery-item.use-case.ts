@@ -1,11 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import type { IGroceryRepository } from '../../domain/grocery.repository.interface';
-import { GroceryItem } from '../../domain/grocery.repository.interface';
+import {
+  GROCERY_REPOSITORY,
+  type IGroceryRepository,
+} from '../../domain/interfaces/grocery.repository.interface';
+import { GroceryItemEntity } from '../../domain/entities/grocery-item.entity';
 
 @Injectable()
 export class UpdateGroceryItemUseCase {
   constructor(
-    @Inject('IGroceryRepository')
+    @Inject(GROCERY_REPOSITORY)
     private readonly repo: IGroceryRepository,
   ) {}
 
@@ -13,7 +16,7 @@ export class UpdateGroceryItemUseCase {
     userId: string,
     id: string,
     data: { name?: string; amount?: number; unit?: string; checked?: boolean },
-  ): Promise<GroceryItem> {
+  ): Promise<GroceryItemEntity> {
     const item = await this.repo.findById(id);
     if (!item || item.userId !== userId) {
       throw new NotFoundException('Grocery item not found');

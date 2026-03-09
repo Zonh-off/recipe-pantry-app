@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RegisterUseCase } from '../../../../../../src/modules/auth/application/use-cases/register.use-case';
-import { PasswordService } from '../../../../../../src/modules/auth/domain/services/password.service';
+import { PasswordService } from '../../../../../../src/modules/auth/infrastructure/services/password.service';
 import {
   USER_REPOSITORY,
   IUserRepository,

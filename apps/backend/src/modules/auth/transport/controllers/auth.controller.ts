@@ -6,25 +6,26 @@ import {
   Req,
   HttpCode,
   HttpStatus,
+  Get,
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
-import { RegisterUseCase } from '../../application/use-cases/register.use-case';
-import { LoginUseCase } from '../../application/use-cases/login.use-case';
-import { RefreshTokenUseCase } from '../../application/use-cases/refresh-token.use-case';
-import { LogoutUseCase } from '../../application/use-cases/logout.use-case';
-import { RegisterDto } from '../dto/register.dto';
-import { LoginDto } from '../dto/login.dto';
-import { Public } from '../../../../common/decorators/public.decorator';
-import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
 import {
-  ApiTags,
+  GetMeUseCase,
+  LoginUseCase,
+  LogoutUseCase,
+  RefreshTokenUseCase,
+  RegisterUseCase,
+} from '@modules/auth/application/use-cases';
+import { CurrentUser, Public } from '@common/decorators';
+import {
+  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
+  ApiTags,
 } from '@nestjs/swagger';
+import { RegisterDto } from '../dto/register.dto';
 import { TokenResponseDto } from '../dto/token-response.dto';
-import { GetMeUseCase } from '../../application/use-cases/get-me.use-case';
-import { Get } from '@nestjs/common';
+import { LoginDto } from '../dto/login.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -35,7 +36,7 @@ export class AuthController {
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
     private readonly getMeUseCase: GetMeUseCase,
-  ) { }
+  ) {}
 
   @Public()
   @ApiOperation({ summary: 'Register a new user' })

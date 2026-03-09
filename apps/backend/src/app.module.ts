@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { validateEnv } from './common/config/env.validation';
-import { PantryModule } from './modules/pantry/pantry.module';
-import { HealthController } from './modules/health/controllers/health.controller';
-import { RecipesModule } from './modules/recipes/recipes.module';
-import { CollectionsModule } from './modules/collections/collections.module';
-import { ProfileModule } from './modules/profile/profile.module';
-import { DatabaseModule } from './core/database/database.module';
-import { GroceryModule } from './modules/grocery/grocery.module';
-import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { PantryModule } from '@modules/pantry/pantry.module';
+import { RecipesModule } from '@modules/recipes/recipes.module';
+import { CollectionsModule } from '@modules/collections/collections.module';
+import { ProfileModule } from '@modules/profile/profile.module';
+import { DatabaseModule } from '@core/database/database.module';
+import { GroceryModule } from '@modules/grocery/grocery.module';
+import { AuthModule } from '@modules/auth/auth.module';
+import { HealthController } from '@modules/health/controllers/health.controller';
+import { validateEnv } from '@common/config';
+import { JwtAuthGuard } from '@common/guards';
 
 @Module({
   imports: [
@@ -34,4 +34,4 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

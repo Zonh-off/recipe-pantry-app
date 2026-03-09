@@ -17,7 +17,7 @@
  *   <PageContainer
  *     title="Collections"
  *     subtitle="Your saved recipe groups"
- *     action={<AppButton size="sm">New Collection</AppButton>}
+ *     action={<AppButton size="sm">New CollectionEntity</AppButton>}
  *   >
  *     <CollectionsGrid />
  *   </PageContainer>

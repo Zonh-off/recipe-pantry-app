@@ -1,21 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type {
-  IProfileRepository,
-  Profile,
-} from '../../domain/profile.repository.interface';
+import { ProfileEntity } from '@modules/profile/domain/entities/profile.entity';
+import {
+  type IProfileRepository,
+  PROFILE_REPOSITORY,
+} from '../../domain/interfaces/profile.repository.interface';
 
 @Injectable()
 export class GetProfileUseCase {
   constructor(
-    @Inject('IProfileRepository')
+    @Inject(PROFILE_REPOSITORY)
     private readonly repo: IProfileRepository,
   ) {}
 
-  async execute(userId: string): Promise<Profile> {
+  async execute(userId: string): Promise<ProfileEntity> {
     const profile = await this.repo.findByUserId(userId);
     if (profile) return profile;
 
-    // RULE 2.7: Initialize profile if not found
+    // Initialize profile if not found
     return this.repo.save({
       userId,
       diet: [],

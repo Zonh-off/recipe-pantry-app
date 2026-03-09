@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeleteCollectionUseCase } from '../../../../../../src/modules/collections/application/use-cases/delete-collection.use-case';
-import { Collection } from '../../../../../../src/modules/collections/domain/collection.repository.interface';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import {CollectionEntity} from "@modules/collections/domain/entities/collection.entity";
 
 describe('DeleteCollectionUseCase', () => {
   let useCase: DeleteCollectionUseCase;
@@ -26,7 +26,7 @@ describe('DeleteCollectionUseCase', () => {
   it('should delete a collection if user owns it and it is not "Saved"', async () => {
     const userId = 'u1';
     const colId = 'c1';
-    const col = new Collection(colId, userId, 'My Customs', []);
+    const col = new CollectionEntity(colId, userId, 'My Customs', []);
 
     repo.findById.mockResolvedValue(col);
     repo.delete.mockResolvedValue(undefined);
@@ -40,7 +40,7 @@ describe('DeleteCollectionUseCase', () => {
   it('should throw BadRequestException if trying to delete "Saved" collection', async () => {
     const userId = 'u1';
     const colId = 'c1';
-    const col = new Collection(colId, userId, 'Saved', []);
+    const col = new CollectionEntity(colId, userId, 'Saved', []);
 
     repo.findById.mockResolvedValue(col);
 
@@ -58,7 +58,7 @@ describe('DeleteCollectionUseCase', () => {
   });
 
   it('should throw NotFoundException if user does not own collection', async () => {
-    repo.findById.mockResolvedValue(new Collection('c1', 'u2', 'Other', []));
+    repo.findById.mockResolvedValue(new CollectionEntity('c1', 'u2', 'Other', []));
     await expect(useCase.execute('u1', 'c1')).rejects.toThrow(
       NotFoundException,
     );

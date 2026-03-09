@@ -83,7 +83,7 @@ export default function Sidebar() {
                 })}
             </nav>
 
-            {/* User Profile & Logout */}
+            {/* User ProfileEntity & Logout */}
             <div className="p-4 border-t border-slate-200 space-y-3">
                 {user ? (
                     <div className="flex flex-col gap-3">

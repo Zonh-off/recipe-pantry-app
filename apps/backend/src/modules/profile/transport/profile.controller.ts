@@ -1,9 +1,11 @@
 import { Controller, Get, Patch, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { GetProfileUseCase } from '../application/use-cases/get-profile.use-case';
-import { UpdateProfileUseCase } from '../application/use-cases/update-profile.use-case';
+import {
+  GetProfileUseCase,
+  UpdateProfileUseCase,
+} from '../application/use-cases';
+import { CurrentUser } from '@common/decorators';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Profile')
@@ -12,7 +14,7 @@ export class ProfileController {
   constructor(
     private readonly getProfile: GetProfileUseCase,
     private readonly updateProfile: UpdateProfileUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({
     summary: 'Get current user profile (dietary preferences, etc.)',

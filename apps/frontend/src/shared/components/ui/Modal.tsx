@@ -11,7 +11,7 @@
  *   <Modal
  *     open={open}
  *     onOpenChange={setOpen}
- *     title="Delete Collection"
+ *     title="Delete CollectionEntity"
  *     description="This action cannot be undone."
  *     confirmLabel="Delete"
  *     confirmVariant="destructive"

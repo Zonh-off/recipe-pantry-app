@@ -21,7 +21,7 @@ model User {
   refreshTokens RefreshToken[]
 }
 
-model Profile {
+model ProfileEntity {
   id           String   @id @default(uuid())
   userId       String   @unique
   user         User     @relation(fields: [userId], references: [id])
@@ -45,7 +45,7 @@ model PantryItem {
   @@unique([userId, ingredientId])
 }
 
-model Collection {
+model CollectionEntity {
   id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
@@ -55,7 +55,7 @@ model Collection {
   updatedAt DateTime @updatedAt
 }
 
-model GroceryItem {
+model GroceryItemEntity {
   id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])

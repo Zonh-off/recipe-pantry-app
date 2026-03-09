@@ -8,8 +8,8 @@ import {
   REFRESH_TOKEN_REPOSITORY,
   IRefreshTokenRepository,
 } from '../../../../../../src/modules/auth/domain/repositories/refresh-token.repository.interface';
-import { PasswordService } from '../../../../../../src/modules/auth/domain/services/password.service';
-import { TokenService } from '../../../../../../src/modules/auth/domain/services/token.service';
+import { PasswordService } from '../../../../../../src/modules/auth/infrastructure/services/password.service';
+import { TokenService } from '../../../../../../src/modules/auth/infrastructure/services/token.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from '../../../../../../src/modules/auth/transport/dto/login.dto';
 import { User } from '../../../../../../src/modules/auth/domain/entities/user.entity';

@@ -1,9 +1,12 @@
 import { Inject, UnauthorizedException } from '@nestjs/common';
-import type { IPantryRepository } from '../../domain/repositories/pantry-repository.interface';
+import {
+  type IPantryRepository,
+  PANTRY_REPOSITORY,
+} from '../../domain/repositories/pantry-repository.interface';
 
 export class RemovePantryItemUseCase {
   constructor(
-    @Inject('IPantryRepository')
+    @Inject(PANTRY_REPOSITORY)
     private readonly pantryRepo: IPantryRepository,
   ) {}
 

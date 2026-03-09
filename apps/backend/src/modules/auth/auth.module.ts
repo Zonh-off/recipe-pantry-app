@@ -1,20 +1,24 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
-import { DatabaseModule } from '../../core/database/database.module';
-import { USER_REPOSITORY } from './domain/repositories/user.repository.interface';
-import { REFRESH_TOKEN_REPOSITORY } from './domain/repositories/refresh-token.repository.interface';
-import { PasswordService } from './domain/services/password.service';
-import { TokenService } from './domain/services/token.service';
-import { RegisterUseCase } from './application/use-cases/register.use-case';
-import { LoginUseCase } from './application/use-cases/login.use-case';
-import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
-import { LogoutUseCase } from './application/use-cases/logout.use-case';
-import { GetMeUseCase } from './application/use-cases/get-me.use-case';
-import { PrismaUserRepository } from './infrastructure/repositories/prisma-user.repository';
-import { PrismaRefreshTokenRepository } from './infrastructure/repositories/prisma-refresh-token.repository';
+import { DatabaseModule } from '@core/database/database.module';
+import { PASSWORD_SERVICE } from './domain/services/password-service.interface';
+import { PasswordService } from './infrastructure/services/password.service';
+import { TOKEN_SERVICE } from './domain/services/token-service.interface';
+import { TokenService } from './infrastructure/services/token.service';
 import { AuthController } from './transport/controllers/auth.controller';
-import { JwtStrategy } from '../../common/strategies/jwt.strategy';
+import {
+  GetMeUseCase,
+  LoginUseCase,
+  LogoutUseCase,
+  RefreshTokenUseCase,
+  RegisterUseCase,
+} from './application/use-cases';
+import { JwtStrategy } from '@common/strategies';
+import { USER_REPOSITORY } from './domain/repositories/user.repository.interface';
+import { PrismaUserRepository } from './infrastructure/repositories/prisma-user.repository';
+import { REFRESH_TOKEN_REPOSITORY } from './domain/repositories/refresh-token.repository.interface';
+import { PrismaRefreshTokenRepository } from './infrastructure/repositories/prisma-refresh-token.repository';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -22,7 +26,7 @@ import { JwtStrategy } from '../../common/strategies/jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '15m' }, // Token expiration
       }),
@@ -30,14 +34,14 @@ import { JwtStrategy } from '../../common/strategies/jwt.strategy';
   ],
   controllers: [AuthController],
   providers: [
-    PasswordService,
-    TokenService,
-    RegisterUseCase,
-    LoginUseCase,
-    RefreshTokenUseCase,
-    LogoutUseCase,
-    GetMeUseCase,
-    JwtStrategy,
+    {
+      provide: PASSWORD_SERVICE,
+      useClass: PasswordService,
+    },
+    {
+      provide: TOKEN_SERVICE,
+      useClass: TokenService,
+    },
     {
       provide: USER_REPOSITORY,
       useClass: PrismaUserRepository,
@@ -46,7 +50,12 @@ import { JwtStrategy } from '../../common/strategies/jwt.strategy';
       provide: REFRESH_TOKEN_REPOSITORY,
       useClass: PrismaRefreshTokenRepository,
     },
+    RegisterUseCase,
+    LoginUseCase,
+    RefreshTokenUseCase,
+    LogoutUseCase,
+    GetMeUseCase,
+    JwtStrategy,
   ],
-  exports: [JwtModule, TokenService],
 })
-export class AuthModule { }
+export class AuthModule {}

@@ -1,19 +1,22 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../../core/database/prisma.service';
 import { CollectionsController } from './transport/collections.controller';
-import { PrismaCollectionRepository } from './infrastructure/repositories-impl/prisma-collection.repository';
-import { GetCollectionsUseCase } from './application/use-cases/get-collections.use-case';
-import { CreateCollectionUseCase } from './application/use-cases/create-collection.use-case';
-import { AddRecipeToCollectionUseCase } from './application/use-cases/add-recipe-to-collection.use-case';
-import { RemoveRecipeFromCollectionUseCase } from './application/use-cases/remove-recipe-from-collection.use-case';
-import { DeleteCollectionUseCase } from './application/use-cases/delete-collection.use-case';
+import { DatabaseModule } from '@/core/database/database.module';
+import { COLLECTION_REPOSITORY } from '@modules/collections/domain/repositories/collection.repository.interface';
+import { PrismaCollectionRepository } from './infrastructure/repositories/prisma-collection.repository';
+import {
+  AddRecipeToCollectionUseCase,
+  CreateCollectionUseCase,
+  DeleteCollectionUseCase,
+  GetCollectionsUseCase,
+  RemoveRecipeFromCollectionUseCase,
+} from './application/use-cases';
 
 @Module({
+  imports: [DatabaseModule],
   controllers: [CollectionsController],
   providers: [
-    PrismaService,
     {
-      provide: 'ICollectionRepository',
+      provide: COLLECTION_REPOSITORY,
       useClass: PrismaCollectionRepository,
     },
     GetCollectionsUseCase,
@@ -24,4 +27,4 @@ import { DeleteCollectionUseCase } from './application/use-cases/delete-collecti
   ],
   exports: [GetCollectionsUseCase],
 })
-export class CollectionsModule { }
+export class CollectionsModule {}

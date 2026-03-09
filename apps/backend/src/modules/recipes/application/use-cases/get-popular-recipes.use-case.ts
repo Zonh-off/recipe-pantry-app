@@ -1,19 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type {
-  IRecipesCachePort,
-  IRecipesProviderPort,
-  SearchRecipesResult,
+import {
+  type IRecipesRepository,
+  RECIPES_REPOSITORY,
+} from '../../domain/interfaces/recipes-repository.interface';
+import {
+  type IRecipesCacheRepository,
+  RECIPES_CACHE_REPOSITORY,
+} from '../../domain/interfaces/recipes-cache-repository.interface';
+import {
   GetPopularParams,
-} from '../../domain/ports/i-recipes-provider.port';
+  SearchRecipesResult,
+} from '../../domain/entities/types';
 
 @Injectable()
 export class GetPopularRecipesUseCase {
   constructor(
-    @Inject('IRecipesProviderPort')
-    private readonly provider: IRecipesProviderPort,
+    @Inject(RECIPES_REPOSITORY)
+    private readonly provider: IRecipesRepository,
 
-    @Inject('IRecipesCachePort')
-    private readonly cache: IRecipesCachePort,
+    @Inject(RECIPES_CACHE_REPOSITORY)
+    private readonly cache: IRecipesCacheRepository,
   ) {}
 
   async execute(params: GetPopularParams): Promise<SearchRecipesResult> {

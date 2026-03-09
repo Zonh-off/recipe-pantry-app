@@ -1,21 +1,24 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../../core/database/prisma.service';
-import { PrismaProfileRepository } from './infrastructure/repositories-impl/prisma-profile.repository';
+import { DatabaseModule } from '@core/database/database.module';
 import { ProfileController } from './transport/profile.controller';
-import { GetProfileUseCase } from './application/use-cases/get-profile.use-case';
-import { UpdateProfileUseCase } from './application/use-cases/update-profile.use-case';
+import { PrismaProfileRepository } from './infrastructure/repositories/prisma-profile.repository';
+import {
+  GetProfileUseCase,
+  UpdateProfileUseCase,
+} from './application/use-cases';
+import { PROFILE_REPOSITORY } from './domain/interfaces/profile.repository.interface';
 
 @Module({
+  imports: [DatabaseModule],
   controllers: [ProfileController],
   providers: [
-    PrismaService,
     {
-      provide: 'IProfileRepository',
+      provide: PROFILE_REPOSITORY,
       useClass: PrismaProfileRepository,
     },
     GetProfileUseCase,
     UpdateProfileUseCase,
   ],
-  exports: ['IProfileRepository', GetProfileUseCase],
+  exports: [PROFILE_REPOSITORY],
 })
-export class ProfileModule { }
+export class ProfileModule {}

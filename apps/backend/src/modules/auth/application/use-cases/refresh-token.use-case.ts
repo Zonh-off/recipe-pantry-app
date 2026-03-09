@@ -1,14 +1,18 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
-import { TokenService } from '../../domain/services/token.service';
 import { REFRESH_TOKEN_REPOSITORY } from '../../domain/repositories/refresh-token.repository.interface';
 import type { IRefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.interface';
+import {
+  type ITokenService,
+  TOKEN_SERVICE,
+} from '../../domain/services/token-service.interface';
 
 @Injectable()
 export class RefreshTokenUseCase {
   constructor(
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: IRefreshTokenRepository,
-    private readonly tokenService: TokenService,
+    @Inject(TOKEN_SERVICE)
+    private readonly tokenService: ITokenService,
   ) {}
 
   async execute(

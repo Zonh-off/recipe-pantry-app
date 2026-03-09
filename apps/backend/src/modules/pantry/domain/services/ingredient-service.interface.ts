@@ -3,6 +3,8 @@ export interface NormalizedIngredient {
   name: string;
 }
 
+export const INGREDIENT_SERVICE = Symbol('INGREDIENT_SERVICE');
+
 export interface IIngredientService {
-  normalize(name: string): Promise<NormalizedIngredient>;
+  normalize(name: string): NormalizedIngredient;
 }

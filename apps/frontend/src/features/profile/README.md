@@ -1,7 +1,7 @@
 # profile feature
 
 Owns all user profile and preferences logic:
-- `api/` — get-profile.ts, update-preferences.ts
+- `api/` — get-profile.entity.ts, update-preferences.ts
 - `components/` — PreferencesForm, DietChipSelector, IntoleranceSelector, CuisineSelector
 - `hooks/` — useProfile, useUpdatePreferencesMutation
 - `lib/` — query-keys.ts

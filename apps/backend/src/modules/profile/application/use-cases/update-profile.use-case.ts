@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type {
-  IProfileRepository,
-  Profile,
-} from '../../domain/profile.repository.interface';
+import {
+  type IProfileRepository,
+  PROFILE_REPOSITORY,
+} from '../../domain/interfaces/profile.repository.interface';
+import { ProfileEntity } from '../../domain/entities/profile.entity';
 
 export type UpdateProfileData = {
   diet?: string[];
@@ -14,11 +15,14 @@ export type UpdateProfileData = {
 @Injectable()
 export class UpdateProfileUseCase {
   constructor(
-    @Inject('IProfileRepository')
+    @Inject(PROFILE_REPOSITORY)
     private readonly repo: IProfileRepository,
   ) {}
 
-  async execute(userId: string, data: UpdateProfileData): Promise<Profile> {
+  async execute(
+    userId: string,
+    data: UpdateProfileData,
+  ): Promise<ProfileEntity> {
     const existing = await this.repo.findByUserId(userId);
 
     if (!existing) {

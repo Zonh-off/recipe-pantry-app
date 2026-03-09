@@ -1,22 +1,31 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type {
-  IRecipesCachePort,
-  IRecipesProviderPort,
+import {
+  type IRecipesRepository,
+  RECIPES_REPOSITORY,
+} from '../../domain/interfaces/recipes-repository.interface';
+import {
+  type IRecipesCacheRepository,
+  RECIPES_CACHE_REPOSITORY,
+} from '../../domain/interfaces/recipes-cache-repository.interface';
+import {
+  type IProfileRepository,
+  PROFILE_REPOSITORY,
+} from '@modules/profile/domain/interfaces/profile.repository.interface';
+import {
   RecommendParams,
   SearchRecipesResult,
-} from '../../domain/ports/i-recipes-provider.port';
-import type { IProfileRepository } from '../../../profile/domain/profile.repository.interface';
+} from '../../domain/entities/types';
 
 @Injectable()
 export class GetRecommendationsUseCase {
   constructor(
-    @Inject('IRecipesProviderPort')
-    private readonly provider: IRecipesProviderPort,
+    @Inject(RECIPES_REPOSITORY)
+    private readonly provider: IRecipesRepository,
 
-    @Inject('IRecipesCachePort')
-    private readonly cache: IRecipesCachePort,
+    @Inject(RECIPES_CACHE_REPOSITORY)
+    private readonly cache: IRecipesCacheRepository,
 
-    @Inject('IProfileRepository')
+    @Inject(PROFILE_REPOSITORY)
     private readonly profileRepo: IProfileRepository,
   ) {}
 

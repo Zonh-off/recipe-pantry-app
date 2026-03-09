@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetCollectionsUseCase } from '../../../../../../src/modules/collections/application/use-cases/get-collections.use-case';
-import { Collection } from '../../../../../../src/modules/collections/domain/collection.repository.interface';
+
+import {CollectionEntity} from "@modules/collections/domain/entities/collection.entity";
 
 describe('GetCollectionsUseCase', () => {
   let useCase: GetCollectionsUseCase;
@@ -24,7 +25,7 @@ describe('GetCollectionsUseCase', () => {
 
   it('should return existing collections and NOT create a new "Saved" if it already exists', async () => {
     const userId = 'user-1';
-    const existing = [new Collection('1', userId, 'Saved', [])];
+    const existing = [new CollectionEntity('1', userId, 'Saved', [])];
     repo.findByUserId.mockResolvedValue(existing);
 
     const result = await useCase.execute(userId);
@@ -38,7 +39,7 @@ describe('GetCollectionsUseCase', () => {
     const userId = 'user-1';
     repo.findByUserId.mockResolvedValue([]);
     repo.create.mockResolvedValue(
-      new Collection('new-id', userId, 'Saved', []),
+      new CollectionEntity('new-id', userId, 'Saved', []),
     );
 
     const result = await useCase.execute(userId);

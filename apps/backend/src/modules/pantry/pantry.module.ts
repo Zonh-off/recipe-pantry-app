@@ -1,24 +1,28 @@
 import { Module } from '@nestjs/common';
+import { DatabaseModule } from '@core/database/database.module';
 import { PantryController } from './transport/controllers/pantry.controller';
-import { PrismaService } from '../../core/database/prisma.service';
-import { PrismaPantryRepository } from './infrastructure/repositories-impl/prisma-pantry.repository';
-import { MockIngredientService } from './infrastructure/adapters-impl/mock-ingredient.service';
-import { AddPantryItemUseCase } from './application/use-cases/add-pantry-item.use-case';
-import { GetPantryItemsUseCase } from './application/use-cases/get-pantry-items.use-case';
-import { RemovePantryItemUseCase } from './application/use-cases/remove-pantry-item.use-case';
-import { UpdatePantryItemUseCase } from './application/use-cases/update-pantry-item.use-case';
-import { GetPantrySuggestionsUseCase } from './application/use-cases/get-pantry-suggestions.use-case';
+import { PANTRY_REPOSITORY } from '@modules/pantry/domain/repositories/pantry-repository.interface';
+import { INGREDIENT_SERVICE } from '@modules/pantry/domain/services/ingredient-service.interface';
+import { PrismaPantryRepository } from './infrastructure/repositories/prisma-pantry.repository';
+import { MockIngredientService } from './infrastructure/services/mock-ingredient.service';
+import {
+  AddPantryItemUseCase,
+  GetPantryItemsUseCase,
+  GetPantrySuggestionsUseCase,
+  RemovePantryItemUseCase,
+  UpdatePantryItemUseCase,
+} from './application/use-cases';
 
 @Module({
+  imports: [DatabaseModule],
   controllers: [PantryController],
   providers: [
-    PrismaService,
     {
-      provide: 'IPantryRepository',
+      provide: PANTRY_REPOSITORY,
       useClass: PrismaPantryRepository,
     },
     {
-      provide: 'IIngredientService',
+      provide: INGREDIENT_SERVICE,
       useClass: MockIngredientService,
     },
     AddPantryItemUseCase,
@@ -27,13 +31,6 @@ import { GetPantrySuggestionsUseCase } from './application/use-cases/get-pantry-
     UpdatePantryItemUseCase,
     GetPantrySuggestionsUseCase,
   ],
-  exports: [
-    'IPantryRepository',
-    AddPantryItemUseCase,
-    GetPantryItemsUseCase,
-    RemovePantryItemUseCase,
-    UpdatePantryItemUseCase,
-    GetPantrySuggestionsUseCase,
-  ],
+  exports: [PANTRY_REPOSITORY],
 })
-export class PantryModule { }
+export class PantryModule {}

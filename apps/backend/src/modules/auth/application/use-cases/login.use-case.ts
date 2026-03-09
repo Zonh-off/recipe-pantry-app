@@ -3,18 +3,27 @@ import type { IUserRepository } from '../../domain/repositories/user.repository.
 import type { IRefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.interface';
 import { USER_REPOSITORY } from '../../domain/repositories/user.repository.interface';
 import { REFRESH_TOKEN_REPOSITORY } from '../../domain/repositories/refresh-token.repository.interface';
-import { PasswordService } from '../../domain/services/password.service';
-import { TokenService } from '../../domain/services/token.service';
 import { LoginDto } from '../../transport/dto/login.dto';
+import {
+  type IPasswordService,
+  PASSWORD_SERVICE,
+} from '../../domain/services/password-service.interface';
+import {
+  type ITokenService,
+  TOKEN_SERVICE,
+} from '../../domain/services/token-service.interface';
 
 @Injectable()
 export class LoginUseCase {
   constructor(
-    @Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: IRefreshTokenRepository,
-    private readonly passwordService: PasswordService,
-    private readonly tokenService: TokenService,
+    @Inject(PASSWORD_SERVICE)
+    private readonly passwordService: IPasswordService,
+    @Inject(TOKEN_SERVICE)
+    private readonly tokenService: ITokenService,
   ) {}
 
   async execute(

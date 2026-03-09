@@ -1,10 +1,13 @@
 import { Inject } from '@nestjs/common';
-import type { IPantryRepository } from '../../domain/repositories/pantry-repository.interface';
+import {
+  type IPantryRepository,
+  PANTRY_REPOSITORY,
+} from '../../domain/repositories/pantry-repository.interface';
 import { PantryItem } from '../../domain/entities/pantry-item.entity';
 
 export class GetPantryItemsUseCase {
   constructor(
-    @Inject('IPantryRepository')
+    @Inject(PANTRY_REPOSITORY)
     private readonly pantryRepo: IPantryRepository,
   ) {}
 

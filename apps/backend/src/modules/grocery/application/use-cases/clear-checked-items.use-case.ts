@@ -1,10 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { IGroceryRepository } from '../../domain/grocery.repository.interface';
+import {
+  GROCERY_REPOSITORY,
+  type IGroceryRepository,
+} from '../../domain/interfaces/grocery.repository.interface';
 
 @Injectable()
 export class ClearCheckedItemsUseCase {
   constructor(
-    @Inject('IGroceryRepository')
+    @Inject(GROCERY_REPOSITORY)
     private readonly repo: IGroceryRepository,
   ) {}
 

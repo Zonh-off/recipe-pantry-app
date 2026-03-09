@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AddRecipeToCollectionUseCase } from '../../../../../../src/modules/collections/application/use-cases/add-recipe-to-collection.use-case';
-import { Collection } from '../../../../../../src/modules/collections/domain/collection.repository.interface';
 import { NotFoundException } from '@nestjs/common';
+import {CollectionEntity} from "@modules/collections/domain/entities/collection.entity";
 
 describe('AddRecipeToCollectionUseCase', () => {
   let useCase: AddRecipeToCollectionUseCase;
@@ -29,11 +29,11 @@ describe('AddRecipeToCollectionUseCase', () => {
     const userId = 'user-1';
     const colId = 'c1';
     const recipeId = 716429;
-    const col = new Collection(colId, userId, 'Saved', []);
+    const col = new CollectionEntity(colId, userId, 'Saved', []);
 
     repo.findById.mockResolvedValue(col);
     repo.update.mockResolvedValue(
-      new Collection(colId, userId, 'Saved', [recipeId]),
+      new CollectionEntity(colId, userId, 'Saved', [recipeId]),
     );
 
     const result = await useCase.execute(userId, colId, recipeId);
@@ -53,7 +53,7 @@ describe('AddRecipeToCollectionUseCase', () => {
   });
 
   it('should throw NotFoundException if user does not own collection', async () => {
-    repo.findById.mockResolvedValue(new Collection('c1', 'u2', 'Other', []));
+    repo.findById.mockResolvedValue(new CollectionEntity('c1', 'u2', 'Other', []));
     await expect(useCase.execute('u1', 'c1', 123)).rejects.toThrow(
       NotFoundException,
     );
@@ -63,7 +63,7 @@ describe('AddRecipeToCollectionUseCase', () => {
     const userId = 'user-1';
     const colId = 'c1';
     const recipeId = 716429;
-    const col = new Collection(colId, userId, 'Saved', [recipeId]);
+    const col = new CollectionEntity(colId, userId, 'Saved', [recipeId]);
 
     repo.findById.mockResolvedValue(col);
 

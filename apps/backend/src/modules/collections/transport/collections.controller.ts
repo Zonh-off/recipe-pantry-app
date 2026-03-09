@@ -3,16 +3,17 @@ import {
   ApiTags,
   ApiOperation,
   ApiParam,
-  ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { GetCollectionsUseCase } from '../application/use-cases/get-collections.use-case';
-import { CreateCollectionUseCase } from '../application/use-cases/create-collection.use-case';
-import { AddRecipeToCollectionUseCase } from '../application/use-cases/add-recipe-to-collection.use-case';
-import { RemoveRecipeFromCollectionUseCase } from '../application/use-cases/remove-recipe-from-collection.use-case';
-import { DeleteCollectionUseCase } from '../application/use-cases/delete-collection.use-case';
+import {
+  AddRecipeToCollectionUseCase,
+  CreateCollectionUseCase,
+  DeleteCollectionUseCase,
+  GetCollectionsUseCase,
+  RemoveRecipeFromCollectionUseCase,
+} from '../application/use-cases';
 import { CreateCollectionDto } from './dto/create-collection.dto';
-import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { CurrentUser } from '@common/decorators';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Collections')
@@ -24,7 +25,7 @@ export class CollectionsController {
     private readonly addRecipe: AddRecipeToCollectionUseCase,
     private readonly removeRecipe: RemoveRecipeFromCollectionUseCase,
     private readonly deleteCollectionUC: DeleteCollectionUseCase,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: 'List all recipe collections for the current user' })
   @Get()
@@ -44,7 +45,7 @@ export class CollectionsController {
   @ApiOperation({ summary: 'Add a recipe to a specific collection' })
   @ApiParam({
     name: 'id',
-    description: 'Internal Collection ID',
+    description: 'Internal CollectionEntity ID',
     example: 'clv...',
   })
   @ApiParam({
@@ -64,7 +65,7 @@ export class CollectionsController {
   @ApiOperation({ summary: 'Remove a recipe from a specific collection' })
   @ApiParam({
     name: 'id',
-    description: 'Internal Collection ID',
+    description: 'Internal CollectionEntity ID',
     example: 'clv...',
   })
   @ApiParam({
@@ -86,7 +87,7 @@ export class CollectionsController {
   })
   @ApiParam({
     name: 'id',
-    description: 'Internal Collection ID',
+    description: 'Internal CollectionEntity ID',
     example: 'clv...',
   })
   @Delete(':id')

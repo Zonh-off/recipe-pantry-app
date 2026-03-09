@@ -1,7 +1,13 @@
 import { Inject } from '@nestjs/common';
-import type { IPantryRepository } from '../../domain/repositories/pantry-repository.interface';
-import type { IIngredientService } from '../../domain/services/ingredient-service.interface';
 import { PantryItem } from '../../domain/entities/pantry-item.entity';
+import {
+  type IPantryRepository,
+  PANTRY_REPOSITORY,
+} from '../../domain/repositories/pantry-repository.interface';
+import {
+  type IIngredientService,
+  INGREDIENT_SERVICE,
+} from '../../domain/services/ingredient-service.interface';
 
 export interface PantryItemData {
   userId: string;
@@ -12,9 +18,9 @@ export interface PantryItemData {
 
 export class AddPantryItemUseCase {
   constructor(
-    @Inject('IPantryRepository')
+    @Inject(PANTRY_REPOSITORY)
     private readonly pantryRepo: IPantryRepository,
-    @Inject('IIngredientService')
+    @Inject(INGREDIENT_SERVICE)
     private readonly ingredientService: IIngredientService,
   ) {}
 

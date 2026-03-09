@@ -1,17 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type {
-  ICollectionRepository,
-  Collection,
-} from '../../domain/collection.repository.interface';
+import {
+  COLLECTION_REPOSITORY,
+  type ICollectionRepository,
+} from '../../domain/repositories/collection.repository.interface';
+import { CollectionEntity } from '@modules/collections/domain/entities/collection.entity';
 
 @Injectable()
 export class GetCollectionsUseCase {
   constructor(
-    @Inject('ICollectionRepository')
+    @Inject(COLLECTION_REPOSITORY)
     private readonly repo: ICollectionRepository,
   ) {}
 
-  async execute(userId: string): Promise<Collection[]> {
+  async execute(userId: string): Promise<CollectionEntity[]> {
     const collections = await this.repo.findByUserId(userId);
 
     // Rule 2.6: Include default "Saved" collection

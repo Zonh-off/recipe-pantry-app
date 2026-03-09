@@ -1,16 +1,22 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { RecipeDetails } from '../../domain/ports/i-recipes-provider.port';
-import type { IRecipesCachePort } from '../../domain/ports/i-recipes-provider.port';
-import type { IRecipesProviderPort } from '../../domain/ports/i-recipes-provider.port';
+import {
+  type IRecipesRepository,
+  RECIPES_REPOSITORY,
+} from '../../domain/interfaces/recipes-repository.interface';
+import {
+  type IRecipesCacheRepository,
+  RECIPES_CACHE_REPOSITORY,
+} from '../../domain/interfaces/recipes-cache-repository.interface';
+import { RecipeDetails } from '../../domain/entities/types';
 
 @Injectable()
 export class GetRecipeDetailsUseCase {
   constructor(
-    @Inject('IRecipesProviderPort')
-    private readonly provider: IRecipesProviderPort,
+    @Inject(RECIPES_REPOSITORY)
+    private readonly provider: IRecipesRepository,
 
-    @Inject('IRecipesCachePort')
-    private readonly cache: IRecipesCachePort,
+    @Inject(RECIPES_CACHE_REPOSITORY)
+    private readonly cache: IRecipesCacheRepository,
   ) {}
 
   async execute(id: number): Promise<RecipeDetails> {

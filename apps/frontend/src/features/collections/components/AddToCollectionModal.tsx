@@ -43,15 +43,15 @@ export function AddToCollectionModal({
         <Modal
             open={open}
             onOpenChange={setOpen}
-            title="Save to Collection"
+            title="Save to CollectionEntity"
             description="Choose a collection to save this recipe to."
             trigger={trigger || (
                 <AppButton size="sm">
                     <Plus className="h-4 w-4 mr-2" />
-                    Save to Collection
+                    Save to CollectionEntity
                 </AppButton>
             )}
-            confirmLabel="Add to Collection"
+            confirmLabel="Add to CollectionEntity"
             onConfirm={handleConfirm}
             confirmDisabled={!selectedId}
         >
@@ -98,7 +98,7 @@ export function AddToCollectionModal({
                     <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-green-100 group-hover:text-green-600 transition-colors">
                         <FolderPlus className="h-5 w-5" />
                     </div>
-                    <span className="font-bold text-sm">Create New Collection</span>
+                    <span className="font-bold text-sm">Create New CollectionEntity</span>
                 </button>
             </div>
         </Modal>

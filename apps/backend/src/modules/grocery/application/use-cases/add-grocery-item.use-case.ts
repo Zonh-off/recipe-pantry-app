@@ -1,18 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { IGroceryRepository } from '../../domain/grocery.repository.interface';
-import { GroceryItem } from '../../domain/grocery.repository.interface';
+import {
+  GROCERY_REPOSITORY,
+  type IGroceryRepository,
+} from '../../domain/interfaces/grocery.repository.interface';
+import { GroceryItemEntity } from '../../domain/entities/grocery-item.entity';
 
 @Injectable()
 export class AddGroceryItemUseCase {
   constructor(
-    @Inject('IGroceryRepository')
+    @Inject(GROCERY_REPOSITORY)
     private readonly repo: IGroceryRepository,
   ) {}
 
   async execute(
     userId: string,
     data: { name: string; amount?: number; unit?: string },
-  ): Promise<GroceryItem> {
+  ): Promise<GroceryItemEntity> {
     const existing = await this.repo.findByName(userId, data.name.trim());
 
     if (existing) {
