@@ -6,7 +6,7 @@ export interface GroceryItem {
     name: string;
     amount?: string;
     category?: string;
-    completed: boolean;
+    checked: boolean;
     recipeName?: string;
 }
 
@@ -23,8 +23,8 @@ export const groceryApi = {
         return data;
     },
 
-    toggleItem: async (id: string | number): Promise<GroceryItem> => {
-        const { data } = await apiClient.patch(`/grocery-list/${id}/toggle`);
+    toggleItem: async ({ id, checked }: { id: string | number, checked: boolean }): Promise<GroceryItem> => {
+        const { data } = await apiClient.patch(`/grocery-list/${id}`, { checked });
         return data;
     },
 
@@ -33,7 +33,12 @@ export const groceryApi = {
     },
 
     clearCompleted: async (): Promise<void> => {
-        await apiClient.post('/grocery-list/clear-completed');
+        await apiClient.delete('/grocery-list/clear/checked');
+    },
+
+    bulkAdd: async (items: { name: string, amount?: number, unit?: string }[]): Promise<{ addedCount: number }> => {
+        const { data } = await apiClient.post('/grocery-list/bulk', { items });
+        return data;
     },
 };
 
@@ -61,7 +66,8 @@ export const useToggleGroceryItem = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: groceryApi.toggleItem,
+        mutationFn: ({ id, checked }: { id: string | number, checked: boolean }) =>
+            groceryApi.toggleItem({ id, checked }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['grocery-list'] });
         },
@@ -84,6 +90,17 @@ export const useClearCompletedGroceryItems = () => {
 
     return useMutation({
         mutationFn: groceryApi.clearCompleted,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['grocery-list'] });
+        },
+    });
+};
+
+export const useBulkAddGroceryItems = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: groceryApi.bulkAdd,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['grocery-list'] });
         },

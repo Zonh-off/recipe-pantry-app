@@ -31,7 +31,10 @@ export default function GroceryListPage() {
     const [groupBy, setGroupBy] = useState<"category" | "recipe" | "none">("category");
 
     const handleToggle = (id: string | number) => {
-        toggleMutation.mutate(id);
+        const item = items.find(i => i.id === id);
+        if (item) {
+            toggleMutation.mutate({ id, checked: !item.checked });
+        }
     };
 
     const handleRemove = (id: string | number) => {
@@ -46,13 +49,13 @@ export default function GroceryListPage() {
         clearMutation.mutate();
     };
 
-    const completedCount = items.filter(i => i.completed).length;
-    const progress = items.length > 0 ? (completedCount / items.length) * 100 : 0;
+    const checkedCount = items.filter(i => i.checked).length;
+    const progress = items.length > 0 ? (checkedCount / items.length) * 100 : 0;
 
     return (
         <PageContainer
             title="Grocery List"
-            subtitle={isLoading ? "Loading your list..." : `${items.length - completedCount} items left to buy`}
+            subtitle={isLoading ? "Loading your list..." : `${items.length - checkedCount} items left to buy`}
             action={
                 <div className="flex gap-2">
                     <AppButton variant="secondary" size="icon-sm">
@@ -123,11 +126,11 @@ export default function GroceryListPage() {
                                         size="sm"
                                         className="justify-start text-slate-500 font-bold hover:text-rose-600 hover:bg-rose-50"
                                         onClick={clearCompleted}
-                                        disabled={completedCount === 0 || clearMutation.isPending}
+                                        disabled={checkedCount === 0 || clearMutation.isPending}
                                         loading={clearMutation.isPending}
                                     >
                                         <Trash2 className="h-4 w-4 mr-2" />
-                                        Clear completed
+                                        Clear checked
                                     </AppButton>
                                 </div>
                             </div>
@@ -175,9 +178,6 @@ export default function GroceryListPage() {
                                 <h3 className="text-xl font-extrabold text-slate-900">Your list is empty</h3>
                                 <p className="text-slate-500 mt-2">Add items manually or from your favorite recipes to get started with your next meal.</p>
                             </div>
-                            <AppButton className="mt-2" onClick={() => handleAddItem("New Item")}>
-                                Add your first item
-                            </AppButton>
                         </div>
                     )}
                 </div>

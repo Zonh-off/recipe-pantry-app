@@ -10,7 +10,7 @@ export interface GroceryItemType {
     name: string;
     amount?: string;
     category?: string;
-    completed: boolean;
+    checked: boolean;
     recipeName?: string;
 }
 
@@ -31,13 +31,13 @@ export function GroceryItem({
         <div
             className={cn(
                 "group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl transition-all",
-                item.completed ? "bg-slate-50 border-slate-100" : "hover:border-green-200 shadow-sm",
+                item.checked ? "bg-slate-50 border-slate-100" : "hover:border-green-200 shadow-sm",
                 className
             )}
         >
             <div className="flex items-center gap-4 flex-1">
                 <Checkbox
-                    checked={item.completed}
+                    checked={item.checked}
                     onCheckedChange={() => onToggle(item.id)}
                     className="h-5 w-5 rounded-md border-slate-300 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
                 />
@@ -45,7 +45,7 @@ export function GroceryItem({
                     <h4
                         className={cn(
                             "font-semibold text-slate-900 capitalize transition-all",
-                            item.completed && "text-slate-400 line-through decoration-slate-300"
+                            item.checked && "text-slate-400 line-through decoration-slate-300"
                         )}
                     >
                         {item.name}
@@ -54,7 +54,7 @@ export function GroceryItem({
                         {item.amount && (
                             <span className={cn(
                                 "text-xs font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500",
-                                item.completed && "opacity-50"
+                                item.checked && "opacity-50"
                             )}>
                                 {item.amount}
                             </span>

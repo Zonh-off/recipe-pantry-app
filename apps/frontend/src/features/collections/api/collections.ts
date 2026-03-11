@@ -5,6 +5,7 @@ export interface Collection {
     id: string;
     name: string;
     recipeCount: number;
+    recipeIds: number[];
     thumbnails: string[];
     recipes?: any[]; // Full recipe objects if requested
 }
@@ -13,30 +14,59 @@ export interface CreateCollectionDto {
     name: string;
 }
 
+export interface UpdateCollectionDto {
+    name: string;
+}
+
 /* ─── API Methods ─────────────────────────────────────────── */
 
 export const collectionsApi = {
     getCollections: async (): Promise<Collection[]> => {
         const { data } = await apiClient.get('/collections');
-        return data;
+        return data.map((c: any) => ({
+            ...c,
+            recipeCount: c.recipeIds?.length || 0,
+            recipeIds: c.recipeIds || [],
+            thumbnails: (c.recipeIds || []).slice(0, 3).map((id: number) => `https://spoonacular.com/recipeImages/${id}-312x231.jpg`)
+        }));
     },
 
     getCollectionDetails: async (id: string): Promise<Collection> => {
         const { data } = await apiClient.get(`/collections/${id}`);
-        return data;
+        return {
+            ...data,
+            recipeCount: data.recipeIds?.length || 0,
+            recipeIds: data.recipeIds || [],
+            thumbnails: (data.recipeIds || []).slice(0, 3).map((id: number) => `https://spoonacular.com/recipeImages/${id}-312x231.jpg`)
+        };
     },
 
     createCollection: async (dto: CreateCollectionDto): Promise<Collection> => {
         const { data } = await apiClient.post('/collections', dto);
-        return data;
+        return {
+            ...data,
+            recipeCount: data.recipeIds?.length || 0,
+            recipeIds: data.recipeIds || [],
+            thumbnails: (data.recipeIds || []).slice(0, 3).map((id: number) => `https://spoonacular.com/recipeImages/${id}-312x231.jpg`)
+        };
     },
 
     addRecipeToCollection: async (collectionId: string, recipeId: string | number): Promise<void> => {
-        await apiClient.post(`/collections/${collectionId}/recipes`, { recipeId });
+        await apiClient.post(`/collections/${collectionId}/recipes/${recipeId}`);
     },
 
     removeCollection: async (id: string): Promise<void> => {
         await apiClient.delete(`/collections/${id}`);
+    },
+
+    updateCollection: async (id: string, dto: UpdateCollectionDto): Promise<Collection> => {
+        const { data } = await apiClient.patch(`/collections/${id}`, dto);
+        return {
+            ...data,
+            recipeCount: data.recipeIds?.length || 0,
+            recipeIds: data.recipeIds || [],
+            thumbnails: (data.recipeIds || []).slice(0, 3).map((recipeId: number) => `https://spoonacular.com/recipeImages/${recipeId}-312x231.jpg`)
+        };
     },
 };
 
@@ -77,6 +107,29 @@ export const useAddRecipeToCollection = () => {
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['collections'] });
             queryClient.invalidateQueries({ queryKey: ['collections', 'details', variables.collectionId] });
+        },
+    });
+};
+
+export const useRemoveCollection = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: collectionsApi.removeCollection,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['collections'] });
+        },
+    });
+};
+
+export const useUpdateCollection = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, name }: { id: string } & UpdateCollectionDto) => collectionsApi.updateCollection(id, { name }),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['collections'] });
+            queryClient.invalidateQueries({ queryKey: ['collections', 'details', variables.id] });
         },
     });
 };

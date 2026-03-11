@@ -29,23 +29,28 @@ export function CollectionCard({
             <AppCard className={cn("overflow-hidden hover:border-green-200 transition-colors", className)}>
                 {/* Cover / Grid Layout */}
                 <div className="aspect-[1.5] bg-slate-100 relative">
-                    {thumbnails.length >= 4 ? (
+                    {thumbnails.length >= 3 ? (
                         <div className="grid grid-cols-2 grid-rows-2 h-full gap-0.5">
-                            {thumbnails.slice(0, 4).map((img, i) => (
+                            {thumbnails.slice(0, 3).map((img, i) => (
                                 <img
                                     key={i}
                                     src={img}
                                     alt=""
-                                    className="w-full h-full object-cover"
+                                    className={cn("w-full h-full object-cover", i === 0 ? "row-span-2" : "")}
                                 />
                             ))}
                         </div>
                     ) : thumbnails.length > 0 ? (
-                        <img
-                            src={thumbnails[0]}
-                            alt=""
-                            className="w-full h-full object-cover"
-                        />
+                        <div className="flex h-full w-full gap-0.5">
+                            {thumbnails.map((img, i) => (
+                                <img
+                                    key={i}
+                                    src={img}
+                                    alt=""
+                                    className="h-full object-cover flex-1 min-w-0"
+                                />
+                            ))}
+                        </div>
                     ) : (
                         <div className="flex items-center justify-center h-full text-slate-300">
                             <FolderHeart className="h-12 w-12" />
@@ -64,9 +69,11 @@ export function CollectionCard({
                             {recipeCount} recipe{recipeCount !== 1 ? 's' : ''}
                         </AppCardDescription>
                     </div>
-                    <button className="text-slate-400 hover:text-slate-600 p-1">
-                        <MoreVertical className="h-4 w-4" />
-                    </button>
+                    {name.toLowerCase() !== 'saved' && (
+                        <button className="text-slate-400 hover:text-slate-600 p-1">
+                            <MoreVertical className="h-4 w-4" />
+                        </button>
+                    )}
                 </AppCardHeader>
             </AppCard>
         </Link>

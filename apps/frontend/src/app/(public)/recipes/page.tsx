@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { PageContainer, SectionHeader, AppButton } from "@/shared/components/ui";
 import {
     RecipeGrid,
@@ -14,7 +15,17 @@ import { cn } from "@/lib/utils";
 import { useRecipesSearch } from "@/features/recipes/api/recipes";
 
 export default function RecipesPage() {
-    const [search, setSearch] = useState("");
+    return (
+        <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center"><LoadingSkeleton variant="card" /></div>}>
+            <RecipesContent />
+        </Suspense>
+    );
+}
+
+function RecipesContent() {
+    const searchParams = useSearchParams();
+    const initialQuery = searchParams.get('q') || "";
+    const [search, setSearch] = useState(initialQuery);
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState<any>({});
 

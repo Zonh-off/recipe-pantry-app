@@ -32,7 +32,7 @@ import { CurrentUser } from '@common/decorators';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Grocery')
-@Controller('grocery')
+@Controller('grocery-list')
 export class GroceryController {
   constructor(
     private readonly getListUC: GetGroceryListUseCase,
@@ -41,7 +41,7 @@ export class GroceryController {
     private readonly removeItemUC: RemoveGroceryItemUseCase,
     private readonly clearCheckedUC: ClearCheckedItemsUseCase,
     private readonly bulkAddUC: GenerateGroceryFromRecipeUseCase,
-  ) {}
+  ) { }
 
   @ApiOperation({
     summary:

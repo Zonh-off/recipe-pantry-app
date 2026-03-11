@@ -6,39 +6,27 @@ import {
 } from "@/shared/components/ui";
 import {
     CollectionGrid,
-    CollectionCard
+    CollectionCard,
+    CreateCollectionModal
 } from "@/features/collections/components";
 import { Plus, Search } from "lucide-react";
 import { AppInput } from "@/shared/components/ui/AppInput";
 import { useState } from "react";
-import { useCollections, useCreateCollection } from "@/features/collections/api/collections";
+import { useCollections } from "@/features/collections/api/collections";
 
 export default function CollectionsPage() {
     const { data: collections = [], isLoading } = useCollections();
-    const createMutation = useCreateCollection();
     const [search, setSearch] = useState("");
 
     const filteredCollections = collections.filter(c =>
         c.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    const handleCreate = () => {
-        const name = prompt("Enter collection name:");
-        if (name) {
-            createMutation.mutate({ name });
-        }
-    };
-
     return (
         <PageContainer
             title="My Collections"
             subtitle="Organize your favorite recipes into custom folders."
-            action={
-                <AppButton size="sm" onClick={handleCreate} loading={createMutation.isPending}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    New Collection
-                </AppButton>
-            }
+            action={<CreateCollectionModal />}
         >
             <div className="space-y-8">
                 {/* Search / Filter Bar */}
@@ -63,15 +51,18 @@ export default function CollectionsPage() {
                         ))}
 
                         {/* Create New placeholder */}
-                        <button
-                            onClick={handleCreate}
-                            className="flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-slate-200 hover:border-green-300 hover:bg-green-50/50 transition-all group aspect-[1.2]"
-                        >
-                            <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center mb-4 group-hover:bg-green-100 group-hover:text-green-600 transition-colors">
-                                <Plus className="h-6 w-6" />
-                            </div>
-                            <span className="font-bold text-slate-600 group-hover:text-green-700">Create New Collection</span>
-                        </button>
+                        <CreateCollectionModal
+                            trigger={
+                                <button
+                                    className="flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-slate-200 hover:border-green-300 hover:bg-green-50/50 transition-all group aspect-[1.5]"
+                                >
+                                    <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center mb-4 group-hover:bg-green-100 group-hover:text-green-600 transition-colors">
+                                        <Plus className="h-6 w-6" />
+                                    </div>
+                                    <span className="font-bold text-slate-600 group-hover:text-green-700">Create New Collection</span>
+                                </button>
+                            }
+                        />
                     </CollectionGrid>
                 )}
 

@@ -6,15 +6,11 @@ import {
     AppButton,
 } from "@/shared/components/ui";
 import { RecipeGrid, RecipeCard } from "@/features/recipes/components";
-import {
-    ChevronLeft,
-    Settings,
-    Trash2,
-    Filter,
-    SortAsc,
-    Plus
-} from "lucide-react";
+import { EditCollectionModal, DeleteCollectionModal } from "@/features/collections/components";
+import { ArrowLeft, Filter, SortAsc, Plus } from "lucide-react";
 import { useCollectionDetails } from "@/features/collections/api/collections";
+import { recipesApi } from "@/features/recipes/api/recipes";
+import { useQueries } from "@tanstack/react-query";
 import { LoadingSkeleton } from "@/shared/components/feedback";
 
 export default function CollectionDetailsPage() {
@@ -24,18 +20,38 @@ export default function CollectionDetailsPage() {
 
     const { data: collection, isLoading, isError } = useCollectionDetails(id);
 
+    const recipeQueries = useQueries({
+        queries: (collection?.recipeIds || []).map((recipeId) => ({
+            queryKey: ['recipes', 'details', String(recipeId)],
+            queryFn: () => recipesApi.getRecipeDetails(String(recipeId)),
+        })),
+    });
+
+    const isRecipesLoading = isLoading || recipeQueries.some(q => q.isLoading);
+    const recipes = recipeQueries.map(q => q.data).filter(Boolean);
+
     return (
         <PageContainer
             title={isLoading ? "Loading CollectionEntity..." : collection?.name || "Collection"}
             subtitle={collection ? `${collection.recipeCount} recipes saved here` : ""}
             action={
                 <div className="flex gap-2">
-                    <AppButton variant="secondary" size="icon-sm">
-                        <Settings className="h-4 w-4" />
-                    </AppButton>
-                    <AppButton variant="destructive" size="icon-sm">
-                        <Trash2 className="h-4 w-4" />
-                    </AppButton>
+                    {collection && (
+                        <>
+                            {collection.name.toLowerCase() !== 'saved' && (
+                                <>
+                                    <EditCollectionModal
+                                        collectionId={collection.id}
+                                        initialName={collection.name}
+                                    />
+                                    <DeleteCollectionModal
+                                        collectionId={collection.id}
+                                        collectionName={collection.name}
+                                    />
+                                </>
+                            )}
+                        </>
+                    )}
                 </div>
             }
         >
@@ -48,7 +64,7 @@ export default function CollectionDetailsPage() {
                         onClick={() => router.push("/collections")}
                         className="text-slate-500 pl-0 hover:bg-transparent"
                     >
-                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        <ArrowLeft className="h-4 w-4 mr-2" />
                         All Collections
                     </AppButton>
 
@@ -69,13 +85,13 @@ export default function CollectionDetailsPage() {
                 </div>
 
                 {/* Recipes Grid */}
-                {isLoading ? (
+                {isRecipesLoading ? (
                     <RecipeGrid>
                         {[1, 2, 3, 4].map(i => <LoadingSkeleton key={i} variant="card" />)}
                     </RecipeGrid>
-                ) : collection?.recipes && collection.recipes.length > 0 ? (
+                ) : recipes && recipes.length > 0 ? (
                     <RecipeGrid>
-                        {collection.recipes.map((recipe: any) => (
+                        {recipes.map((recipe: any) => (
                             <RecipeCard key={recipe.id} {...recipe} />
                         ))}
                     </RecipeGrid>

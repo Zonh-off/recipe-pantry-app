@@ -90,6 +90,7 @@ export default function HomePage() {
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.name}
+                onClick={() => router.push(`/recipes?q=${encodeURIComponent(cat.name.toLowerCase())}`)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-slate-700 font-medium hover:border-green-300 hover:bg-green-50 hover:text-green-700 transition-all shadow-sm active:scale-95"
               >
                 <span>{cat.emoji}</span>

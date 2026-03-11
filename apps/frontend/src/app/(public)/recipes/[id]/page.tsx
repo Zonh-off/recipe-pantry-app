@@ -12,7 +12,8 @@ import {
     ShoppingCart,
     CheckCircle2,
     Bookmark,
-    CircleAlert
+    CircleAlert,
+    FolderHeart
 } from "lucide-react";
 import {
     PageContainer,
@@ -27,6 +28,8 @@ import { cn } from "@/lib/utils";
 import { useRecipeDetails } from "@/features/recipes/api/recipes";
 import { LoadingSkeleton } from "@/shared/components/feedback";
 import { AddToCollectionModal } from "@/features/collections/components";
+import { useCollections } from "@/features/collections/api/collections";
+import { AddToGroceryListModal } from "@/features/grocery-list/components";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function RecipeDetailsPage() {
@@ -36,8 +39,13 @@ export default function RecipeDetailsPage() {
     const { user } = useAuth();
 
     const { data: recipe, isLoading, isError } = useRecipeDetails(id);
+    const { data: collections = [] } = useCollections();
     const [isSaved, setIsSaved] = useState(false);
     const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+
+    const recipeCollections = user
+        ? collections.filter(c => c.recipeIds.includes(Number(id)))
+        : [];
 
     if (isLoading) {
         return (
@@ -185,6 +193,16 @@ export default function RecipeDetailsPage() {
                             {cuisines.length > 0 && (
                                 <Chip color="sky" className="font-semibold">{cuisines[0]}</Chip>
                             )}
+                            {recipeCollections.map(collection => (
+                                <AppBadge
+                                    key={collection.id}
+                                    variant="violet"
+                                    className="rounded-lg h-7 px-3 border-none flex items-center shadow-sm"
+                                >
+                                    <FolderHeart className="h-3 w-3 mr-1.5" />
+                                    {collection.name}
+                                </AppBadge>
+                            ))}
                         </div>
 
                         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
@@ -243,17 +261,23 @@ export default function RecipeDetailsPage() {
                             )}
 
                             {ingredients.length > 0 && (
-                                <AppButton
-                                    variant="secondary"
-                                    className="flex-1 h-12 border-slate-200"
-                                    onClick={handleGatedAction}
-                                >
-                                    <ShoppingCart className="h-5 w-5 mr-2" />
-                                    {showPantryInfo && missingIngredients.length > 0
-                                        ? `Get ${missingIngredients.length} Ingredients`
-                                        : "Add to grocery list"
+                                <AddToGroceryListModal
+                                    recipeTitle={recipe.title}
+                                    ingredients={ingredients}
+                                    trigger={
+                                        <AppButton
+                                            variant="secondary"
+                                            className="flex-1 h-12 border-slate-200"
+                                            onClick={handleGatedAction}
+                                        >
+                                            <ShoppingCart className="h-5 w-5 mr-2" />
+                                            {showPantryInfo && missingIngredients.length > 0
+                                                ? `Get ${missingIngredients.length} Ingredients`
+                                                : "Add to grocery list"
+                                            }
+                                        </AppButton>
                                     }
-                                </AppButton>
+                                />
                             )}
                         </div>
                     </div>
@@ -305,9 +329,15 @@ export default function RecipeDetailsPage() {
                                     <p className="text-xs font-semibold text-amber-700 leading-snug">
                                         You're missing {missingIngredients.length} ingredients. Add them to your grocery list with one click.
                                     </p>
-                                    <AppButton variant="ghost" size="sm" className="text-amber-700 font-bold hover:bg-amber-100 mt-2 p-0 h-auto">
-                                        Add all to list →
-                                    </AppButton>
+                                    <AddToGroceryListModal
+                                        recipeTitle={recipe.title}
+                                        ingredients={ingredients}
+                                        trigger={
+                                            <AppButton variant="ghost" size="sm" className="text-amber-700 font-bold hover:bg-amber-100 mt-2 p-0 h-auto">
+                                                Add missing to list →
+                                            </AppButton>
+                                        }
+                                    />
                                 </div>
                             )}
                         </AppCard>

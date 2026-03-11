@@ -9,6 +9,8 @@ import {
   DeleteCollectionUseCase,
   GetCollectionsUseCase,
   RemoveRecipeFromCollectionUseCase,
+  GetCollectionByIdUseCase,
+  UpdateCollectionUseCase,
 } from './application/use-cases';
 
 @Module({
@@ -24,7 +26,9 @@ import {
     AddRecipeToCollectionUseCase,
     RemoveRecipeFromCollectionUseCase,
     DeleteCollectionUseCase,
+    GetCollectionByIdUseCase,
+    UpdateCollectionUseCase,
   ],
-  exports: [GetCollectionsUseCase],
+  exports: [GetCollectionsUseCase, GetCollectionByIdUseCase, UpdateCollectionUseCase],
 })
-export class CollectionsModule {}
+export class CollectionsModule { }

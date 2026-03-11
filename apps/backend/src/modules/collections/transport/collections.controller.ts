@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -11,8 +11,11 @@ import {
   DeleteCollectionUseCase,
   GetCollectionsUseCase,
   RemoveRecipeFromCollectionUseCase,
+  GetCollectionByIdUseCase,
+  UpdateCollectionUseCase,
 } from '../application/use-cases';
 import { CreateCollectionDto } from './dto/create-collection.dto';
+import { UpdateCollectionDto } from './dto/update-collection.dto';
 import { CurrentUser } from '@common/decorators';
 
 @ApiBearerAuth('bearer')
@@ -25,12 +28,25 @@ export class CollectionsController {
     private readonly addRecipe: AddRecipeToCollectionUseCase,
     private readonly removeRecipe: RemoveRecipeFromCollectionUseCase,
     private readonly deleteCollectionUC: DeleteCollectionUseCase,
-  ) {}
+    private readonly getCollectionById: GetCollectionByIdUseCase,
+    private readonly updateCollectionUC: UpdateCollectionUseCase,
+  ) { }
 
   @ApiOperation({ summary: 'List all recipe collections for the current user' })
   @Get()
   async list(@CurrentUser() userId: string) {
     return this.getCollections.execute(userId);
+  }
+
+  @ApiOperation({ summary: 'Get details of a specific collection' })
+  @ApiParam({
+    name: 'id',
+    description: 'Internal CollectionEntity ID',
+    example: 'clv...',
+  })
+  @Get(':id')
+  async getOne(@CurrentUser() userId: string, @Param('id') id: string) {
+    return this.getCollectionById.execute(userId, id);
   }
 
   @ApiOperation({ summary: 'Create a new custom recipe collection' })
@@ -40,6 +56,21 @@ export class CollectionsController {
     @Body() dto: CreateCollectionDto,
   ) {
     return this.createCollection.execute(userId, dto.name);
+  }
+
+  @ApiOperation({ summary: 'Update an existing recipe collection (e.g. rename)' })
+  @ApiParam({
+    name: 'id',
+    description: 'Internal CollectionEntity ID',
+    example: 'clv...',
+  })
+  @Patch(':id')
+  async update(
+    @CurrentUser() userId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdateCollectionDto,
+  ) {
+    return this.updateCollectionUC.execute(userId, id, dto.name);
   }
 
   @ApiOperation({ summary: 'Add a recipe to a specific collection' })
