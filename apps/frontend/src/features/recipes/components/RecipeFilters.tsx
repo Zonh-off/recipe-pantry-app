@@ -146,7 +146,7 @@ export function RecipeFilters({ onFilterChange, className }: RecipeFiltersProps)
                                 const newValue = Array.isArray(val) ? val[0] : val;
                                 updateFilters({ maxTime: newValue });
                             }}
-                            className="py-2"
+                            className="py-1 bg-slate-100 rounded-full"
                         />
                         <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
                             <span>5m</span>
@@ -174,7 +174,7 @@ export function RecipeFilters({ onFilterChange, className }: RecipeFiltersProps)
                                 const newValue = Array.isArray(val) ? val[0] : val;
                                 updateFilters({ maxCalories: newValue });
                             }}
-                            className="py-2"
+                            className="py-1 bg-slate-100 rounded-full"
                         />
                         <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
                             <span>100</span>

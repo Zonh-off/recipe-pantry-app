@@ -57,11 +57,11 @@ export class SpoonacularRepository implements IRecipesRepository {
 
       const items = Array.isArray(data?.results)
         ? data.results.map((r: any) => ({
-            id: r.id,
-            title: r.title,
-            image: r.image,
-            readyInMinutes: r.readyInMinutes,
-          }))
+          id: r.id,
+          title: r.title,
+          image: r.image,
+          readyInMinutes: r.readyInMinutes,
+        }))
         : [];
 
       return {
@@ -93,11 +93,29 @@ export class SpoonacularRepository implements IRecipesRepository {
 
       const ingredients = Array.isArray(data?.extendedIngredients)
         ? data.extendedIngredients.map((i: any) => ({
-            name: i.name,
-            amount: Number(i.amount ?? 0),
-            unit: String(i.unit ?? ''),
-          }))
+          name: i.name,
+          amount: Number(i.amount ?? 0),
+          unit: String(i.unit ?? ''),
+        }))
         : [];
+
+      // Extract calories from summary if not directly available (Spoonacular summary usually has <b>XXX calories</b>)
+      let calories = 0;
+      if (data.summary) {
+        const calMatch = data.summary.match(/<b>(\d+)\s+calories<\/b>/i);
+        if (calMatch && calMatch[1]) {
+          calories = parseInt(calMatch[1], 10);
+        }
+      }
+
+      // Try to get analyzed instructions for structured steps
+      let instructions = data.instructions;
+      if (Array.isArray(data.analyzedInstructions) && data.analyzedInstructions.length > 0) {
+        const steps = data.analyzedInstructions[0].steps;
+        if (Array.isArray(steps) && steps.length > 0) {
+          instructions = steps.map((s: any) => s.step).join('\n\n');
+        }
+      }
 
       return {
         id: data.id,
@@ -107,7 +125,8 @@ export class SpoonacularRepository implements IRecipesRepository {
         readyInMinutes: data.readyInMinutes,
         servings: data.servings,
         ingredients,
-        instructions: data.instructions,
+        instructions,
+        calories,
       };
     } catch (e: any) {
       throw new InternalServerErrorException(
@@ -150,26 +169,26 @@ export class SpoonacularRepository implements IRecipesRepository {
 
       const items: CookRecipeItem[] = Array.isArray(data)
         ? data.map((r) => {
-            const used = Array.isArray(r.usedIngredients)
-              ? r.usedIngredients
-              : [];
-            const missed = Array.isArray(r.missedIngredients)
-              ? r.missedIngredients
-              : [];
+          const used = Array.isArray(r.usedIngredients)
+            ? r.usedIngredients
+            : [];
+          const missed = Array.isArray(r.missedIngredients)
+            ? r.missedIngredients
+            : [];
 
-            const missedCount = Number(
-              r.missedIngredientCount ?? missed.length ?? 0,
-            );
+          const missedCount = Number(
+            r.missedIngredientCount ?? missed.length ?? 0,
+          );
 
-            return {
-              id: Number(r.id),
-              title: String(r.title ?? ''),
-              image: r.image ? String(r.image) : undefined,
-              usedIngredients: used.map(mapIng),
-              missedIngredients: missed.map(mapIng),
-              missedCount,
-            };
-          })
+          return {
+            id: Number(r.id),
+            title: String(r.title ?? ''),
+            image: r.image ? String(r.image) : undefined,
+            usedIngredients: used.map(mapIng),
+            missedIngredients: missed.map(mapIng),
+            missedCount,
+          };
+        })
         : [];
 
       const filtered =
@@ -204,11 +223,11 @@ export class SpoonacularRepository implements IRecipesRepository {
   ): SearchRecipesResult {
     const items = Array.isArray(data?.results)
       ? data.results.map((r: any) => ({
-          id: r.id,
-          title: r.title,
-          image: r.image,
-          readyInMinutes: r.readyInMinutes,
-        }))
+        id: r.id,
+        title: r.title,
+        image: r.image,
+        readyInMinutes: r.readyInMinutes,
+      }))
       : [];
 
     return {

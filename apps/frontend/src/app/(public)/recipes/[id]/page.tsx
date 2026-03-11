@@ -42,6 +42,7 @@ export default function RecipeDetailsPage() {
     const { data: collections = [] } = useCollections();
     const [isSaved, setIsSaved] = useState(false);
     const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const recipeCollections = user
         ? collections.filter(c => c.recipeIds.includes(Number(id)))
@@ -79,11 +80,25 @@ export default function RecipeDetailsPage() {
     const diets = recipe.diets ?? [];
     const cuisines = recipe.cuisines ?? [];
     const ingredients = recipe.ingredients ?? [];
-    const instructions = Array.isArray(recipe.instructions)
-        ? recipe.instructions
-        : typeof recipe.instructions === 'string'
-            ? [recipe.instructions]
-            : [];
+
+    // Parse instructions into steps - handle string with custom newlines or HTML
+    let instructions: string[] = [];
+    if (Array.isArray(recipe.instructions)) {
+        instructions = recipe.instructions;
+    } else if (typeof recipe.instructions === 'string') {
+        const raw = recipe.instructions;
+        if (raw.includes('\n\n')) {
+            instructions = raw.split('\n\n').filter(s => s.trim());
+        } else if (raw.includes('<li>')) {
+            // Very basic HTML list parsing if needed
+            instructions = raw
+                .split(/<li>|<\/li>|<ol>|<\/ol>|<ul>|<\/ul>/)
+                .map(s => s.replace(/<[^>]*>?/gm, '').trim())
+                .filter(s => s.length > 0);
+        } else {
+            instructions = [raw];
+        }
+    }
 
     const missingIngredients = user ? ingredients.filter(i => i.status === "missing") : [];
     const showPantryInfo = !!user;
@@ -209,9 +224,22 @@ export default function RecipeDetailsPage() {
                             {recipe.title}
                         </h1>
 
-                        <p className="text-slate-500 text-lg leading-relaxed">
-                            {recipe.summary ? recipe.summary.replace(/<[^>]*>?/gm, '') : 'No description available.'}
-                        </p>
+                        <div className="relative">
+                            <p className={cn(
+                                "text-slate-500 text-lg leading-relaxed transition-all duration-300",
+                                !isExpanded && "line-clamp-3"
+                            )}>
+                                {recipe.summary ? recipe.summary.replace(/<[^>]*>?/gm, '') : 'No description available.'}
+                            </p>
+                            {recipe.summary && recipe.summary.replace(/<[^>]*>?/gm, '').length > 250 && (
+                                <button
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    className="text-green-600 font-bold text-sm mt-2 hover:text-green-700 transition-colors flex items-center gap-1"
+                                >
+                                    {isExpanded ? "Show less" : "Read more"}
+                                </button>
+                            )}
+                        </div>
 
                         {/* Metadata Grid */}
                         <div className="grid grid-cols-3 gap-4 border-y border-slate-100 py-6">

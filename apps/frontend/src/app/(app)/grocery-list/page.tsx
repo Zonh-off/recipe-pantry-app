@@ -58,9 +58,9 @@ export default function GroceryListPage() {
             subtitle={isLoading ? "Loading your list..." : `${items.length - checkedCount} items left to buy`}
             action={
                 <div className="flex gap-2">
-                    <AppButton variant="secondary" size="icon-sm">
+{/*                    <AppButton variant="secondary" size="icon-sm">
                         <Share2 className="h-4 w-4" />
-                    </AppButton>
+                    </AppButton>*/}
                     <AppButton variant="secondary" size="icon-sm">
                         <Printer className="h-4 w-4" />
                     </AppButton>

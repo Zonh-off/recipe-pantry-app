@@ -69,14 +69,14 @@ export default function CollectionDetailsPage() {
                     </AppButton>
 
                     <div className="flex items-center gap-2">
-                        <AppButton variant="outline" size="sm" className="hidden sm:flex">
+                        {/*<AppButton variant="outline" size="sm" className="hidden sm:flex">
                             <Filter className="h-4 w-4 mr-2" />
                             Filter
                         </AppButton>
                         <AppButton variant="outline" size="sm" className="hidden sm:flex">
                             <SortAsc className="h-4 w-4 mr-2" />
                             Sort
-                        </AppButton>
+                        </AppButton>*/}
                         <AppButton size="sm" onClick={() => router.push("/recipes")}>
                             <Plus className="h-4 w-4 mr-1" />
                             Add Recipe

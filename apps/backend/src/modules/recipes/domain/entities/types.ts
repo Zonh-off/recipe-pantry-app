@@ -40,6 +40,7 @@ export type RecipeDetails = {
   servings?: number;
   ingredients: RecipeIngredient[];
   instructions?: string;
+  calories?: number;
 };
 
 export type CookFromPantryParams = {
