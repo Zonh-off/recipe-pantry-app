@@ -11,6 +11,7 @@ export interface IGroceryRepository {
     name: string;
     amount?: number | null;
     unit?: string | null;
+    recipeName?: string | null;
   }): Promise<GroceryItemEntity>;
   update(
     id: string,

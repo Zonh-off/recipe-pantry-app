@@ -10,11 +10,11 @@ export class AddGroceryItemUseCase {
   constructor(
     @Inject(GROCERY_REPOSITORY)
     private readonly repo: IGroceryRepository,
-  ) {}
+  ) { }
 
   async execute(
     userId: string,
-    data: { name: string; amount?: number; unit?: string },
+    data: { name: string; amount?: number; unit?: string; recipeName?: string },
   ): Promise<GroceryItemEntity> {
     const existing = await this.repo.findByName(userId, data.name.trim());
 
@@ -23,6 +23,7 @@ export class AddGroceryItemUseCase {
       return this.repo.update(existing.id, {
         amount: newAmount,
         unit: data.unit || existing.unit,
+        recipeName: data.recipeName || existing.recipeName,
       });
     }
 
@@ -31,6 +32,7 @@ export class AddGroceryItemUseCase {
       name: data.name.trim(),
       amount: data.amount,
       unit: data.unit,
+      recipeName: data.recipeName,
     });
   }
 }

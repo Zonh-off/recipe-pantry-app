@@ -62,7 +62,8 @@ export function AddToGroceryListModal({
                 return {
                     name: i.name,
                     amount,
-                    unit: i.unit
+                    unit: i.unit,
+                    recipeName: recipeTitle
                 };
             });
 

@@ -27,6 +27,11 @@ export class CreateGroceryItemDto {
   @IsOptional()
   @IsString()
   unit?: string;
+
+  @ApiPropertyOptional({ example: 'Classic Pizza', description: 'Associated recipe' })
+  @IsOptional()
+  @IsString()
+  recipeName?: string;
 }
 
 export class UpdateGroceryItemDto {
@@ -50,6 +55,11 @@ export class UpdateGroceryItemDto {
   @IsOptional()
   @IsBoolean()
   checked?: boolean;
+
+  @ApiPropertyOptional({ example: 'Classic Pizza' })
+  @IsOptional()
+  @IsString()
+  recipeName?: string;
 }
 
 export class BulkAddItemDto {

@@ -5,7 +5,7 @@ export interface GroceryItem {
     id: string | number;
     name: string;
     amount?: string;
-    category?: string;
+    unit?: string;
     checked: boolean;
     recipeName?: string;
 }
@@ -18,8 +18,8 @@ export const groceryApi = {
         return data;
     },
 
-    addItem: async (name: string): Promise<GroceryItem> => {
-        const { data } = await apiClient.post('/grocery-list', { name });
+    addItem: async (name: string, recipeName?: string): Promise<GroceryItem> => {
+        const { data } = await apiClient.post('/grocery-list', { name, recipeName });
         return data;
     },
 
@@ -36,7 +36,7 @@ export const groceryApi = {
         await apiClient.delete('/grocery-list/clear/checked');
     },
 
-    bulkAdd: async (items: { name: string, amount?: number, unit?: string }[]): Promise<{ addedCount: number }> => {
+    bulkAdd: async (items: { name: string, amount?: number, unit?: string, recipeName?: string }[]): Promise<{ addedCount: number }> => {
         const { data } = await apiClient.post('/grocery-list/bulk', { items });
         return data;
     },
@@ -55,7 +55,8 @@ export const useAddGroceryItem = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: groceryApi.addItem,
+        mutationFn: ({ name, recipeName }: { name: string, recipeName?: string }) =>
+            groceryApi.addItem(name, recipeName),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['grocery-list'] });
         },

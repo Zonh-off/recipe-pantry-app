@@ -6,5 +6,6 @@ export class GroceryItemEntity {
     public readonly amount: number | null,
     public readonly unit: string | null,
     public readonly checked: boolean,
-  ) {}
+    public readonly recipeName: string | null = null,
+  ) { }
 }

@@ -62,6 +62,7 @@ model GroceryItem {
   amount    Float?
   unit      String?
   checked   Boolean  @default(false)
+  recipeName String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

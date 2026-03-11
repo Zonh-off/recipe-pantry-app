@@ -28,7 +28,7 @@ export default function GroceryListPage() {
     const removeMutation = useRemoveGroceryItem();
     const clearMutation = useClearCompletedGroceryItems();
 
-    const [groupBy, setGroupBy] = useState<"category" | "recipe" | "none">("category");
+    const [groupBy, setGroupBy] = useState<"recipe" | "none">("recipe");
 
     const handleToggle = (id: string | number) => {
         const item = items.find(i => i.id === id);
@@ -42,7 +42,7 @@ export default function GroceryListPage() {
     };
 
     const handleAddItem = (name: string) => {
-        addMutation.mutate(name);
+        addMutation.mutate({ name });
     };
 
     const clearCompleted = () => {
@@ -90,16 +90,6 @@ export default function GroceryListPage() {
                                 <div className="flex flex-col gap-2">
                                     <div className="flex bg-slate-100 p-1 rounded-xl">
                                         <button
-                                            onClick={() => setGroupBy("category")}
-                                            className={cn(
-                                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
-                                                groupBy === "category" ? "bg-white shadow-sm text-green-700" : "text-slate-500 hover:text-slate-700"
-                                            )}
-                                        >
-                                            <LayoutGrid className="h-3 w-3" />
-                                            Category
-                                        </button>
-                                        <button
                                             onClick={() => setGroupBy("recipe")}
                                             className={cn(
                                                 "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all",
@@ -137,7 +127,7 @@ export default function GroceryListPage() {
 
                             <div className="bg-green-50 rounded-2xl p-4 border border-green-100">
                                 <div className="flex gap-3">
-                                    <div className="bg-green-100 p-2 rounded-xl text-green-600">
+                                    <div className="h-fit bg-green-100 p-2 rounded-xl text-green-600">
                                         <CheckCircle2 className="h-5 w-5" />
                                     </div>
                                     <div>

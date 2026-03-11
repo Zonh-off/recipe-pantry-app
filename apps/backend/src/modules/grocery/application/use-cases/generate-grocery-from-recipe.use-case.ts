@@ -5,11 +5,12 @@ export type IngredientToBuy = {
   name: string;
   amount?: number;
   unit?: string;
+  recipeName?: string;
 };
 
 @Injectable()
 export class GenerateGroceryFromRecipeUseCase {
-  constructor(private readonly addItemUC: AddGroceryItemUseCase) {}
+  constructor(private readonly addItemUC: AddGroceryItemUseCase) { }
 
   async execute(
     userId: string,
@@ -22,6 +23,7 @@ export class GenerateGroceryFromRecipeUseCase {
         name: ingredient.name,
         amount: ingredient.amount,
         unit: ingredient.unit,
+        recipeName: ingredient.recipeName,
       });
       addedCount++;
     }

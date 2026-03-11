@@ -9,7 +9,7 @@ export interface GroceryItemType {
     id: string | number;
     name: string;
     amount?: string;
-    category?: string;
+    unit?: string;
     checked: boolean;
     recipeName?: string;
 }
@@ -56,7 +56,7 @@ export function GroceryItem({
                                 "text-xs font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500",
                                 item.checked && "opacity-50"
                             )}>
-                                {item.amount}
+                                {item.amount} {item.unit}
                             </span>
                         )}
                         {item.recipeName && (

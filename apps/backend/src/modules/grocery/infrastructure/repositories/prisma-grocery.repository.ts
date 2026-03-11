@@ -5,7 +5,7 @@ import { GroceryItemEntity } from '../../domain/entities/grocery-item.entity';
 
 @Injectable()
 export class PrismaGroceryRepository implements IGroceryRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findByUserId(userId: string): Promise<GroceryItemEntity[]> {
     const items = await this.prisma.groceryItem.findMany({
@@ -40,6 +40,7 @@ export class PrismaGroceryRepository implements IGroceryRepository {
     name: string;
     amount?: number | null;
     unit?: string | null;
+    recipeName?: string | null;
   }): Promise<GroceryItemEntity> {
     const item = await this.prisma.groceryItem.create({
       data: {
@@ -47,6 +48,7 @@ export class PrismaGroceryRepository implements IGroceryRepository {
         name: data.name,
         amount: data.amount,
         unit: data.unit,
+        recipeName: data.recipeName,
       },
     });
 
@@ -64,6 +66,7 @@ export class PrismaGroceryRepository implements IGroceryRepository {
         amount: data.amount,
         unit: data.unit,
         checked: data.checked,
+        recipeName: data.recipeName,
       },
     });
 
@@ -95,6 +98,7 @@ export class PrismaGroceryRepository implements IGroceryRepository {
       raw.amount,
       raw.unit,
       raw.checked,
+      raw.recipeName,
     );
   }
 }
