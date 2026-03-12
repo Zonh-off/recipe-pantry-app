@@ -2,25 +2,17 @@
 
 import {
     PageContainer,
-    AppButton
 } from "@/shared/components/ui";
 import {
     CollectionGrid,
     CollectionCard,
     CreateCollectionModal
 } from "@/features/collections/components";
-import { Plus, Search } from "lucide-react";
-import { AppInput } from "@/shared/components/ui/AppInput";
-import { useState } from "react";
+import { Plus } from "lucide-react";
 import { useCollections } from "@/features/collections/api/collections";
 
 export default function CollectionsPage() {
     const { data: collections = [], isLoading } = useCollections();
-    const [search, setSearch] = useState("");
-
-    const filteredCollections = collections.filter(c =>
-        c.name.toLowerCase().includes(search.toLowerCase())
-    );
 
     return (
         <PageContainer
@@ -29,16 +21,6 @@ export default function CollectionsPage() {
             action={<CreateCollectionModal />}
         >
             <div className="space-y-8">
-                {/* Search / Filter Bar */}
-                <div className="max-w-md">
-                    <AppInput
-                        placeholder="Search collections..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        icon={<Search className="h-4 w-4 text-slate-400" />}
-                        className="bg-white border-slate-200"
-                    />
-                </div>
 
                 {isLoading ? (
                     <div className="py-20 text-center text-slate-400 font-medium">
@@ -46,7 +28,7 @@ export default function CollectionsPage() {
                     </div>
                 ) : (
                     <CollectionGrid>
-                        {filteredCollections.map((collection) => (
+                        {collections.map((collection) => (
                             <CollectionCard key={collection.id} {...collection} />
                         ))}
 
@@ -64,12 +46,6 @@ export default function CollectionsPage() {
                             }
                         />
                     </CollectionGrid>
-                )}
-
-                {!isLoading && filteredCollections.length === 0 && search && (
-                    <div className="py-20 text-center border border-dashed border-slate-200 rounded-3xl">
-                        <p className="text-slate-500">No collections found matching your search.</p>
-                    </div>
                 )}
             </div>
         </PageContainer>

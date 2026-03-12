@@ -35,10 +35,6 @@ function RecipesContent() {
     });
     const recipes = data?.items ?? [];
 
-    const handleSearch = () => {
-        // useRecipesSearch handles the fetch automatically when search changes
-    };
-
     const handleFilterChange = (newFilters: any) => {
         setFilters(newFilters);
     };
@@ -54,7 +50,6 @@ function RecipesContent() {
                     <SearchBar
                         value={search}
                         onChange={setSearch}
-                        onSearch={handleSearch}
                         className="flex-1"
                     />
                     <AppButton
@@ -70,10 +65,10 @@ function RecipesContent() {
                     </AppButton>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-4">
                     {/* Filters Sidebar */}
                     <aside className={cn(
-                        "lg:col-span-1 space-y-6",
+                        "lg:col-span-1 space-y-6 lg:pr-8",
                         !showFilters && "hidden lg:block lg:invisible lg:h-0"
                     )}>
                         <RecipeFilters onFilterChange={handleFilterChange} />

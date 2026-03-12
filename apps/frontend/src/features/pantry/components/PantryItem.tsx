@@ -7,7 +7,8 @@ import { AppButton } from "@/shared/components/ui/AppButton";
 interface PantryItemProps {
     id: string | number;
     name: string;
-    amount?: string;
+    amount?: string | number;
+    unit?: string;
     category?: string;
     className?: string;
     onRemove?: (id: string | number) => void;
@@ -18,6 +19,7 @@ export function PantryItem({
     id,
     name,
     amount,
+    unit,
     category,
     className,
     onRemove,
@@ -31,14 +33,16 @@ export function PantryItem({
             )}
         >
             <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-xl">
-                    {/* Placeholder for ingredient icon or emoji */}
-                    🍎
+                <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-xl shadow-inner border border-slate-100">
+                    {/* Placeholder for ingredient icon or emoji based on category */}
+                    {category === "Produce" ? "🥦" : category === "Dairy" ? "🧀" : category === "Meat" ? "🥩" : "🍎"}
                 </div>
                 <div>
                     <h4 className="font-semibold text-slate-900 capitalize">{name}</h4>
-                    {amount && (
-                        <p className="text-xs text-slate-500 font-medium">{amount}</p>
+                    {(amount || unit) && (
+                        <p className="text-xs text-slate-500 font-medium">
+                            {amount} {unit}
+                        </p>
                     )}
                     {category && (
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">

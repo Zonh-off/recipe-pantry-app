@@ -6,7 +6,8 @@ import { SectionHeader } from "@/shared/components/ui";
 interface Ingredient {
     id: string | number;
     name: string;
-    amount?: string;
+    amount?: string | number;
+    unit?: string;
     category?: string;
 }
 

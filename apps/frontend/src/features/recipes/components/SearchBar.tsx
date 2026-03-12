@@ -2,13 +2,11 @@
 
 import { Search, X } from "lucide-react";
 import { AppInput } from "@/shared/components/ui/AppInput";
-import { AppButton } from "@/shared/components/ui/AppButton";
 import { cn } from "@/lib/utils";
 
 interface SearchBarProps {
     value: string;
     onChange: (value: string) => void;
-    onSearch?: () => void;
     placeholder?: string;
     className?: string;
 }
@@ -16,7 +14,6 @@ interface SearchBarProps {
 export function SearchBar({
     value,
     onChange,
-    onSearch,
     placeholder = "Search for recipes, ingredients, or cuisines...",
     className,
 }: SearchBarProps) {
@@ -39,19 +36,8 @@ export function SearchBar({
                         ) : null
                     }
                     className="h-12 text-base md:text-sm pl-11 pr-10 shadow-sm border-slate-200 focus-visible:ring-green-600/10"
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter" && onSearch) {
-                            onSearch();
-                        }
-                    }}
                 />
             </div>
-            <AppButton
-                onClick={onSearch}
-                className="hidden md:flex h-12 shadow-md shadow-green-600/10"
-            >
-                Search
-            </AppButton>
         </div>
     );
 }
