@@ -1,73 +1,114 @@
-# Recipe Pantry App - Backend
+# ⚙️ Recipe Pantry Backend
 
-This is the backend for the Recipe Pantry App, built with [NestJS](https://nestjs.com/), [Prisma ORM](https://www.prisma.io/), PostgreSQL, and Redis. It follows a strict Clean Architecture design pattern with distinct layering, ensuring high maintainability, testability, and separation of concerns.
+The robust core of the Recipe Pantry App, built with **NestJS**. It follows **Clean Architecture** and **Domain-Driven Design (DDD)** principles to provide a scalable, testable, and high-performance API.
 
-## Architecture
+---
 
-The project is structured around the principles of Clean Architecture. Business logic and core definitions are isolated from external frameworks or services. 
+## 🚀 Overview
 
-Each feature is organized by domain modules (`src/modules/*`):
-- **Core (Domain)**: pure TypeScript definitions (`entities`, `repositories` interfaces, `services` containing core logic).
-- **Application**: Application specific use-cases orchestrating the business logic.
-- **Infrastructure**: Adapters to external services (e.g., Prisma implementation of repositories, Spoonacular API clients).
-- **Transport**: Entry points into the system such as HTTP Controllers (REST API endpoints), DTOs for request validation.
+The backend handles complex recipe logic, pantry inventory management, user authentication, and smart mapping between ingredients. It integrates with external providers (Spoonacular) while maintaining a strict separation between business rules and infrastructure.
 
-## Tech Stack
-- **Framework:** NestJS
-- **Language:** TypeScript
-- **Database:** PostgreSQL (with Prisma Client/Adapter)
-- **Caching:** Redis (`ioredis`)
-- **Authentication:** JWT & Passport.js
-- **Validation:** class-validator & class-transformer
+---
 
-## Requirements
-- Node.js (>= 20)
-- `pnpm`
-- Docker (for local PostgreSQL and Redis)
+## ✨ Key Features
 
-## Setup & Local Development
+- **🔐 Robust Authentication**: JWT-based system with login, registration, and profile management.
+- **🍳 Smart Recipe Engine**: 
+  - Integrated with Spoonacular API for global recipe discovery.
+  - **Forgiving Matching**: Advanced logic to match recipe ingredients with pantry items regardless of units or quantities.
+  - **Composite Ingredient Handling**: Splits and matches complex items like "Salt and Pepper".
+- **📦 Pantry Management**: CRUD operations for user kitchen inventory with ingredient normalization.
+- **🛒 Grocery Orchestration**: Logic for adding missing recipe ingredients to shopping lists.
+- **📁 Collection Management**: Personalized recipe folders and saving logic.
+- **⚡ Performance Caching**: Redis-backed caching for recipe searches and recommendations.
+- **📝 API Documentation**: Auto-generated Swagger documentation for all endpoints.
 
-1. **Install Dependencies**
+---
+
+## 🏗 Architecture
+
+The project follows a **Layered Clean Architecture**:
+
+- **Transport Layer (`transport/`)**: API Controllers and DTOs. Handles HTTP requests/responses and validation.
+- **Application Layer (`application/`)**: Contains **Use Cases**. This is where the orchestration of business logic happens.
+- **Domain Layer (`domain/`)**: Pure business logic. Entities, repository interfaces, and domain services. Zero dependencies on external frameworks.
+- **Infrastructure Layer (`infrastructure/`)**: Implementation of repository interfaces (Prisma/DB), external API clients (Spoonacular), and caching (Redis).
+
+---
+
+## 🛠 Tech Stack
+
+- **Framework**: NestJS
+- **ORM**: Prisma
+- **Database**: PostgreSQL
+- **Cache**: Redis
+- **Documentation**: Swagger / OpenAPI
+- **Validation**: Zod & Class-Validator
+- **Testing**: Jest
+
+---
+
+## 📁 Project Structure
+
+```text
+src/
+├── common/          # Shared decorators, guards, filters, and interceptors
+├── config/          # Centralized configuration logic
+├── modules/         # Domain-specific modules
+│   ├── recipes/     # Core recipe search and details logic
+│   ├── pantry/      # Inventory and ingredient normalization
+│   ├── grocery/     # Shopping list management
+│   ├── auth/        # Identity and access management
+│   └── collections/ # User folders and recipe saving
+└── main.ts          # Application entry point
+```
+
+---
+
+## 🔧 Getting Started
+
+### Prerequisites
+- Node.js 20+
+- pnpm
+- Docker (for DB & Cache)
+
+### Development
+
+1. **Install dependencies**:
    ```bash
    pnpm install
    ```
 
-2. **Environment Variables**
-   Ensure you have a `.env` file in the root of the project with the necessary variables (refer to `.env.example` if available, or set `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`, and `SPOONACULAR_API_KEY`).
-
-3. **Database Setup**
-   Ensure your Docker containers for Postgres and Redis are running.
+2. **Setup environment**:
+   Create a `.env` file in the root of this folder (refer to `.env.example`):
    ```bash
-   # Run Prisma Migrations
+   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/recipe_pantry"
+   REDIS_URL="redis://localhost:6379"
+   SPOONACULAR_API_KEY="your_api_key_here"
+   JWT_SECRET="your_secret_here"
+   ```
+
+3. **Database & Infrastructure**:
+   ```bash
+   # Spin up containers
+   docker-compose up -d
+   # Run migrations
    pnpm prisma migrate dev
-
-   # Generate Prisma Client
-   pnpm prisma generate
    ```
 
-4. **Run the Application**
-
+4. **Run the server**:
    ```bash
-   # development mode (recompiles on change)
    pnpm run start:dev
-
-   # production mode
-   pnpm run build
-   pnpm run start:prod
    ```
 
-## API Documentation
+- **API Base**: `http://localhost:3001/v1`
+- **Swagger Docs**: `http://localhost:3001/api` (or `/docs`)
 
-Swagger UI is configured for the backend. Once the server is running, you can access the interactive API documentation at:
-- **Swagger URL:** `http://localhost:3001/docs`
+---
 
-## Scripts
+## 🧪 Backend Guidelines
 
-- `pnpm run build`: Compile the application.
-- `pnpm run format`: Format code using Prettier.
-- `pnpm run lint`: Run ESLint.
-- `pnpm run test`: Run Jest unit tests.
-- `pnpm run test:watch`: Run Jest in watch mode.
-
-## Testing
-Tests reside in the `test/` folder, matching the `src/` directory structure. Use `pnpm run test` to execute them.
+1. **Dependency Inversion**: Always depend on interfaces in the Domain layer, never on concrete Infrastructure implementations.
+2. **Fat Domain, Thin Transport**: Keep validation and orchestration in transport/application and business rules in the Domain.
+3. **Use Cases**: Every primary action (e.g., `AddPantryItem`) should have its own dedicated Use Case class.
+4. **Error Handling**: Use the global `HttpException` filters and custom domain exceptions.
