@@ -42,18 +42,32 @@ export class GetRecipeDetailsUseCase {
     // If userId provided, cross-reference with pantry
     if (userId && recipe.ingredients) {
       const pantry = await this.pantryRepo.list(userId);
-      const pantryNames = new Set(
-        pantry.map((p) => p.name.toLowerCase().trim()),
-      );
+      const pantryNames = pantry.map((p) => p.name.toLowerCase().trim());
 
       recipe = {
         ...recipe,
-        ingredients: recipe.ingredients.map((ing) => ({
-          ...ing,
-          status: pantryNames.has(ing.name.toLowerCase().trim())
-            ? 'available'
-            : 'missing',
-        })),
+        ingredients: recipe.ingredients.map((ing) => {
+          const recipeIngName = ing.name.toLowerCase().trim();
+
+          // Check for direct or partial match
+          // We split the recipe ingredient by common separators to handle "Salt and Pepper"
+          const components = recipeIngName.split(/\s+and\s+|\s*,\s*|\s*&\s*/);
+
+          const isAvailable = components.every(comp => {
+            const trimmedComp = comp.trim();
+            if (!trimmedComp) return true;
+            return pantryNames.some(pName =>
+              pName === trimmedComp ||
+              pName.includes(trimmedComp) ||
+              trimmedComp.includes(pName)
+            );
+          });
+
+          return {
+            ...ing,
+            status: isAvailable ? 'available' : 'missing',
+          };
+        }),
       };
     } else if (recipe.ingredients) {
       recipe = {

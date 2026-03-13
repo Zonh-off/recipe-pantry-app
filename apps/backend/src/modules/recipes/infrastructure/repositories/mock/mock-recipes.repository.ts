@@ -28,6 +28,10 @@ export class MockRecipesRepository implements IRecipesRepository {
     return JSON.parse(raw);
   }
 
+  searchIngredients(query: string, limit?: number): Promise<string[]> {
+    throw new Error('Method not implemented.');
+  }
+
   async cookFromPantry(params: any) {
     const raw = await readFile(
       join(this.fixturesDir, 'cook_from_pantry.json'),
