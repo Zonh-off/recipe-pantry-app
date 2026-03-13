@@ -327,4 +327,27 @@ export class SpoonacularRepository implements IRecipesRepository {
       );
     }
   }
+
+  async searchIngredients(query: string, limit?: number): Promise<string[]> {
+    if (!query) return [];
+
+    const queryParams: Record<string, any> = {
+      apiKey: this.apiKey,
+      query,
+      number: limit ?? 10,
+    };
+
+    try {
+      const { data } = await firstValueFrom(
+        this.http.get(`${this.baseUrl}/food/ingredients/autocomplete`, {
+          params: queryParams,
+        }),
+      );
+
+      return Array.isArray(data) ? data.map((item: any) => item.name) : [];
+    } catch (e: any) {
+      // Return empty instead of crashing for autocomplete
+      return [];
+    }
+  }
 }

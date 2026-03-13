@@ -21,6 +21,7 @@ export interface RecipeIngredient {
     id: number;
     name: string;
     amount: string;
+    unit: string;
     status: 'available' | 'missing' | 'neutral';
 }
 
@@ -68,6 +69,11 @@ export const recipesApi = {
         const { data } = await apiClient.get('/recipes/recommendations');
         return data;
     },
+    searchIngredients: async (query: string): Promise<string[]> => {
+        if (!query) return [];
+        const { data } = await apiClient.get('/recipes/ingredients/search', { params: { q: query } });
+        return data;
+    },
 };
 
 /* ─── React Query Hooks ───────────────────────────────────── */
@@ -82,11 +88,20 @@ export const useRecipesSearch = (params: any) => {
         maxCalories: params.maxCalories,
         page: params.page,
         pageSize: params.pageSize,
+        // mode: params.mode is handled by the backend search logic if we decide to unify it 
+        // but for now HomePage uses useRecipesSearch with mode: pantry which we need to handle.
     };
 
+    // If mode is pantry, we use another endpoint or handle it in search
+    const fetchFn = params.mode === 'pantry'
+        ? () => apiClient.post('/recipes/cook-from-pantry', null, {
+            params: { limit: params.pageSize, maxMissing: params.maxMissing }
+        }).then(res => res.data)
+        : () => recipesApi.searchRecipes(apiParams);
+
     return useQuery({
-        queryKey: ['recipes', 'search', apiParams],
-        queryFn: () => recipesApi.searchRecipes(apiParams),
+        queryKey: ['recipes', 'search', apiParams, params.mode],
+        queryFn: fetchFn,
     });
 };
 
@@ -102,5 +117,14 @@ export const useRecipeRecommendations = () => {
     return useQuery({
         queryKey: ['recipes', 'recommendations'],
         queryFn: recipesApi.getRecommendations,
+    });
+};
+
+export const useIngredientSearch = (query: string) => {
+    return useQuery({
+        queryKey: ['ingredients', 'search', query],
+        queryFn: () => recipesApi.searchIngredients(query),
+        enabled: query.length >= 2,
+        staleTime: 1000 * 60 * 5, // 5 mins
     });
 };

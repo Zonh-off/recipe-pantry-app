@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, Inject } from '@nestjs/common';
 import {
   ApiParam,
   ApiQuery,
@@ -18,6 +18,8 @@ import { SearchRecipesQueryDto } from './dto/search-recipes.query.dto';
 import { GetPopularQueryDto } from './dto/get-popular.query.dto';
 import { CurrentUser, Public } from '@common/decorators';
 import { CookFromPantryQueryDto } from './dto/cook-from-pantry.query.dto';
+import { RECIPES_REPOSITORY } from '../domain/interfaces/recipes-repository.interface';
+import type { IRecipesRepository } from '../domain/interfaces/recipes-repository.interface';
 
 @ApiBearerAuth('bearer')
 @ApiTags('Recipes')
@@ -30,6 +32,8 @@ export class RecipesController {
     private readonly getPopularUC: GetPopularRecipesUseCase,
     private readonly getCategoriesUC: GetCategoriesUseCase,
     private readonly getRecommendationsUC: GetRecommendationsUseCase,
+    @Inject(RECIPES_REPOSITORY)
+    private readonly provider: IRecipesRepository,
   ) { }
 
   @ApiOperation({ summary: 'Search for recipes with various filters' })
@@ -94,8 +98,8 @@ export class RecipesController {
   })
   @Public()
   @Get(':id')
-  details(@Param('id') id: string) {
-    return this.getDetails.execute(Number(id));
+  details(@Param('id') id: string, @CurrentUser() userId?: string) {
+    return this.getDetails.execute(Number(id), userId);
   }
 
   @ApiOperation({ summary: 'Find recipes based on current pantry ingredients' })
@@ -105,5 +109,12 @@ export class RecipesController {
     @Query() q: CookFromPantryQueryDto,
   ) {
     return this.cookFromPantryUC.execute(userId, q.maxMissing, q.limit);
+  }
+
+  @ApiOperation({ summary: 'Search for ingredients (autocomplete)' })
+  @Public()
+  @Get('ingredients/search')
+  searchIngredients(@Query('q') query: string) {
+    return this.provider.searchIngredients(query);
   }
 }

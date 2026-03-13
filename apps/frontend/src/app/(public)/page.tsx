@@ -2,8 +2,9 @@
 
 import { PageContainer, SectionHeader, AppButton } from '@/shared/components/ui';
 import { RecipeGrid, RecipeCard } from '@/features/recipes/components';
-import { ChefHat } from 'lucide-react';
-import { useRecipeRecommendations } from '@/features/recipes/api/recipes';
+import { ChefHat, Plus, ShoppingBasket } from 'lucide-react';
+import { useRecipeRecommendations, useRecipesSearch, Recipe } from '@/features/recipes/api/recipes';
+import { usePantry } from '@/features/pantry/api/pantry';
 import { LoadingSkeleton } from '@/shared/components/feedback';
 import { useAuth } from '@/providers/auth-provider';
 import { useRouter } from 'next/navigation';
@@ -41,7 +42,18 @@ const POPULAR_RECIPES = [
 export default function HomePage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { data: recommendations, isLoading } = useRecipeRecommendations();
+  const { data: recommendations, isLoading: recommendationsLoading } = useRecipeRecommendations();
+  const { data: pantryItems = [], isLoading: pantryLoading } = usePantry();
+
+  // Fetch recipes based on pantry ingredients
+  const { data: pantryRecipes, isLoading: pantryRecipesLoading } = useRecipesSearch({
+    mode: 'pantry',
+    pageSize: 4,
+  });
+
+  const hasPantryItems = pantryItems.length > 0;
+  const hasPantryRecipes = (pantryRecipes?.items?.length ?? 0) > 0;
+  const isLoading = recommendationsLoading || pantryLoading || (hasPantryItems && pantryRecipesLoading);
 
   return (
     <PageContainer
@@ -50,29 +62,33 @@ export default function HomePage() {
     >
       <div className="space-y-12 pb-10">
         {/* Banner / Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-green-600 p-8 md:p-12 text-white shadow-xl shadow-green-600/20">
+        <section className="relative overflow-hidden rounded-[2.5rem] bg-green-600 p-8 md:p-12 text-white shadow-xl shadow-green-600/20">
           <div className="relative z-10 max-w-xl">
             <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
-              {user ? "What's in your pantry?" : "Cook with what you have."}
+              {user ? (hasPantryItems ? (hasPantryRecipes ? "Cook something fresh." : "Almost there!") : "Your pantry is empty.") : "Cook with what you have."}
             </h2>
-            <p className="text-green-50 mb-8 text-lg opacity-90">
+            <p className="text-green-50 mb-8 text-lg opacity-90 leading-relaxed">
               {user
-                ? <>We found <span className="font-bold underline">8 recipes</span> you can cook right now with your current ingredients.</>
+                ? (hasPantryItems
+                  ? (hasPantryRecipes
+                    ? <>We found <span className="font-bold underline">{pantryRecipes?.total ?? 0} recipes</span> you can cook with your current ingredients.</>
+                    : "Not enough ingredients to provide recipes from your pantry. Keep adding more!")
+                  : "Add your ingredients to see personalized recipe suggestions and minimize food waste.")
                 : "Manage your ingredients, discover perfect recipes, and build grocery lists effortlessly."
               }
             </p>
             <div className="flex flex-wrap gap-4">
               <AppButton
                 variant="secondary"
-                className="bg-white text-green-700 hover:bg-green-50 border-none shadow-lg px-8 h-12 text-base font-bold"
+                className="bg-white text-green-700 hover:bg-green-50 border-none shadow-lg px-8 h-12 text-base font-bold rounded-xl"
                 onClick={() => router.push(user ? '/pantry' : '/register')}
               >
-                {user ? "Cook from Pantry" : "Get Started"}
+                {user ? (hasPantryItems && hasPantryRecipes ? "Explore Pantry Recipes" : "Add Ingredients") : "Get Started"}
               </AppButton>
               {!user && (
                 <AppButton
                   variant="ghost"
-                  className="text-white hover:bg-white/10 border border-white/20 px-8 h-12 text-base"
+                  className="text-white hover:bg-white/10 border border-white/20 px-8 h-12 text-base rounded-xl"
                   onClick={() => router.push('/login')}
                 >
                   Sign In
@@ -100,14 +116,69 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Pantry Recipes or Empty Pantry CTA */}
+        {user && (
+          <section>
+            {!hasPantryItems ? (
+              <>
+                <SectionHeader title="Complete Your Pantry" subtitle="Add more items to get better recommendations" />
+                <div className="bg-slate-50 border border-dashed border-slate-200 rounded-[2rem] p-10 text-center flex flex-col items-center max-w-2xl mx-auto shadow-sm">
+                  <div className="bg-white p-4 rounded-2xl shadow-sm mb-4">
+                    <ShoppingBasket className="h-8 w-8 text-slate-300" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">No ingredients added yet</h3>
+                  <p className="text-slate-500 mb-6">Start by adding what you have in your kitchen. We'll show you exactly what you can cook!</p>
+                  <AppButton onClick={() => router.push('/pantry')} className="rounded-xl px-8 shadow-md shadow-green-600/10">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add first ingredient
+                  </AppButton>
+                </div>
+              </>
+            ) : pantryRecipesLoading ? (
+              <>
+                <SectionHeader title="Finding matching recipes..." />
+                <RecipeGrid>
+                  {[1, 2, 3, 4].map((i) => (
+                    <LoadingSkeleton key={i} variant="card" />
+                  ))}
+                </RecipeGrid>
+              </>
+            ) : hasPantryRecipes ? (
+              <>
+                <SectionHeader
+                  title="Ready to Cook"
+                  subtitle="Recipes that match your ingredients"
+                  action={
+                    <AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50" onClick={() => router.push('/recipes?mode=pantry')}>
+                      View all →
+                    </AppButton>
+                  }
+                />
+                <RecipeGrid>
+                  {pantryRecipes?.items?.slice(0, 4).map((recipe: Recipe) => (
+                    <RecipeCard key={recipe.id} {...recipe} />
+                  ))}
+                </RecipeGrid>
+              </>
+            ) : (
+              <div className="bg-amber-50/50 border border-amber-100 rounded-[2rem] p-8 text-center flex flex-col items-center shadow-sm">
+                <p className="text-amber-800 font-medium">Not enough ingredients to provide recipes from your pantry yet. Try adding more common items like salt, pepper, or olive oil!</p>
+                <AppButton variant="ghost" className="mt-4 text-amber-700 font-bold hover:bg-amber-100" onClick={() => router.push('/pantry')}>
+                  Manage Pantry →
+                </AppButton>
+              </div>
+            )}
+          </section>
+        )}
+
         {/* Recommendations Section */}
         <section>
           <SectionHeader
             title={user ? "Recommended for You" : "Trending Recipes"}
-            subtitle={user ? "Based on your pantry ingredients" : "Top picks for your next meal"}
+            subtitle={user ? "Based on your taste preferences" : "Top picks for your next meal"}
             action={<AppButton variant="ghost" size="sm" className="text-green-600 font-bold hover:bg-green-50" onClick={() => router.push('/recipes')}>See all →</AppButton>}
           />
-          {isLoading ? (
+          {recommendationsLoading ? (
             <RecipeGrid>
               {[1, 2, 3, 4].map((i) => (
                 <LoadingSkeleton key={i} variant="card" />
@@ -115,7 +186,7 @@ export default function HomePage() {
             </RecipeGrid>
           ) : (
             <RecipeGrid>
-              {recommendations?.items?.slice(0, 4).map((recipe) => (
+              {recommendations?.items?.slice(0, 4).map((recipe: Recipe) => (
                 <RecipeCard key={recipe.id} {...recipe} />
               ))}
             </RecipeGrid>

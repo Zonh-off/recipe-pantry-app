@@ -18,4 +18,5 @@ export interface IRecipesRepository {
   getPopular(params: GetPopularParams): Promise<SearchRecipesResult>;
   getCategories(): Promise<PopularCategory[]>;
   getRecommendations(params: RecommendParams): Promise<SearchRecipesResult>;
+  searchIngredients(query: string, limit?: number): Promise<string[]>;
 }

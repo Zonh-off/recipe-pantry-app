@@ -339,15 +339,10 @@ export default function RecipeDetailsPage() {
                                                     {ingredient.name}
                                                 </span>
                                                 <span className="text-xs font-bold text-slate-400 ml-2">
-                                                    {ingredient.amount}
+                                                    {ingredient.amount} {ingredient.unit}
                                                 </span>
                                             </div>
                                         </div>
-                                        {showPantryInfo && ingredient.status === "missing" && (
-                                            <AppButton variant="ghost" size="icon-xs" className="text-green-600 opacity-0 group-hover:opacity-100">
-                                                <Plus className="h-4 w-4" />
-                                            </AppButton>
-                                        )}
                                     </div>
                                 ))}
                             </div>

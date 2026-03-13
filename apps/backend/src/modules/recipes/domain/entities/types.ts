@@ -26,9 +26,11 @@ export type SearchRecipesResult = {
 };
 
 export type RecipeIngredient = {
+  id?: number;
   name: string;
   amount: number;
   unit: string;
+  status?: 'available' | 'missing' | 'neutral';
 };
 
 export type RecipeDetails = {

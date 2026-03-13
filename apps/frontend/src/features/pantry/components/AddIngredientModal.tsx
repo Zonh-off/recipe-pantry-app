@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Modal, AppInput, AppButton } from "@/shared/components/ui";
-import { Plus } from "lucide-react";
+import { Plus, Search, Check, Loader2 } from "lucide-react";
+import { useIngredientSearch } from "@/features/recipes/api/recipes";
+import { useClickAway } from "react-use";
 
 interface AddIngredientModalProps {
     trigger?: React.ReactElement;
@@ -16,14 +18,26 @@ export function AddIngredientModal({ trigger, onAdd }: AddIngredientModalProps) 
     const [name, setName] = useState("");
     const [amount, setAmount] = useState<number | undefined>(undefined);
     const [unit, setUnit] = useState("Other");
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    // Autocomplete hook
+    const { data: suggestions = [], isLoading: isSearching } = useIngredientSearch(name);
+
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    useClickAway(dropdownRef, () => setShowSuggestions(false));
 
     const handleAdd = () => {
         if (!name) return;
-        if (!amount || amount <= 0) return;
-        onAdd(name, amount, unit);
+        // Allow numeric amount or default to 1 if user just wants the item
+        onAdd(name, amount || 1, unit);
         setName("");
         setAmount(undefined);
         setOpen(false);
+    };
+
+    const handleSelectSuggestion = (suggestion: string) => {
+        setName(suggestion);
+        setShowSuggestions(false);
     };
 
     return (
@@ -31,7 +45,7 @@ export function AddIngredientModal({ trigger, onAdd }: AddIngredientModalProps) 
             open={open}
             onOpenChange={setOpen}
             title="Add Ingredient"
-            description="Add a new item to your pantry."
+            description="Add a new item to your pantry with correct spelling."
             trigger={trigger || (
                 <AppButton size="sm">
                     <Plus className="h-4 w-4 mr-2" />
@@ -40,18 +54,53 @@ export function AddIngredientModal({ trigger, onAdd }: AddIngredientModalProps) 
             )}
             confirmLabel="Add to Pantry"
             onConfirm={handleAdd}
+            onCancel={() => {
+                setName("");
+                setAmount(undefined);
+            }}
         >
-            <div className="space-y-4">
-                <AppInput
-                    label="Ingredient Name"
-                    placeholder="e.g. Tomato"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    autoFocus
-                />
+            <div className="space-y-4 pb-4">
+                <div className="relative" ref={dropdownRef}>
+                    <AppInput
+                        label="Ingredient Name"
+                        placeholder="Search ingredients..."
+                        value={name}
+                        onChange={(e) => {
+                            setName(e.target.value);
+                            setShowSuggestions(true);
+                        }}
+                        onFocus={() => setShowSuggestions(true)}
+                        autoFocus
+                        icon={<Search className="h-4 w-4" />}
+                        trailingElement={isSearching ? <Loader2 className="h-4 w-4 animate-spin text-slate-300" /> : null}
+                    />
+
+                    {showSuggestions && name.length >= 2 && (suggestions.length > 0 || isSearching) && (
+                        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                            {isSearching && suggestions.length === 0 ? (
+                                <div className="p-4 text-center text-xs text-slate-400">Searching...</div>
+                            ) : (
+                                <div className="max-h-48 overflow-y-auto">
+                                    {suggestions.map((s, i) => (
+                                        <button
+                                            key={i}
+                                            type="button"
+                                            className="w-full px-4 py-2.5 text-left text-sm hover:bg-slate-50 flex items-center justify-between group transition-colors"
+                                            onClick={() => handleSelectSuggestion(s)}
+                                        >
+                                            <span className="font-medium text-slate-700">{s}</span>
+                                            <Check className="h-3 w-3 text-green-600 opacity-0 group-hover:opacity-100" />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
                 <AppInput
                     label="Amount"
-                    placeholder="e.g. 500g, 2 items"
+                    placeholder="e.g. 500"
                     type="number"
                     value={amount ?? ""}
                     onChange={(e) => setAmount(e.target.value ? +e.target.value : undefined)}

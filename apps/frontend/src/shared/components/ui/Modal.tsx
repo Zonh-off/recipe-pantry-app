@@ -60,6 +60,8 @@ interface ModalProps {
     confirmVariant?: 'primary' | 'destructive' | 'secondary';
     /** Called when confirm is clicked */
     onConfirm?: () => void;
+    /** Called when cancel or close is clicked */
+    onCancel?: () => void;
     /** Shows a loading spinner on the confirm button */
     confirmLoading?: boolean;
     /** Disable the confirm button */
@@ -85,6 +87,7 @@ export function Modal({
     cancelLabel = 'Cancel',
     confirmVariant = 'primary',
     onConfirm,
+    onCancel,
     confirmLoading,
     confirmDisabled,
     size = 'md',
@@ -126,7 +129,10 @@ export function Modal({
                             <AppButton
                                 variant="secondary"
                                 size="sm"
-                                onClick={() => onOpenChange?.(false)}
+                                onClick={() => {
+                                    onCancel?.();
+                                    onOpenChange?.(false);
+                                }}
                             >
                                 {cancelLabel}
                             </AppButton>

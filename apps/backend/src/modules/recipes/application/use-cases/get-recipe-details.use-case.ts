@@ -7,6 +7,10 @@ import {
   type IRecipesCacheRepository,
   RECIPES_CACHE_REPOSITORY,
 } from '../../domain/interfaces/recipes-cache-repository.interface';
+import {
+  type IPantryRepository,
+  PANTRY_REPOSITORY,
+} from '@modules/pantry/domain/repositories/pantry-repository.interface';
 import { RecipeDetails } from '../../domain/entities/types';
 
 @Injectable()
@@ -17,19 +21,50 @@ export class GetRecipeDetailsUseCase {
 
     @Inject(RECIPES_CACHE_REPOSITORY)
     private readonly cache: IRecipesCacheRepository,
-  ) {}
 
-  async execute(id: number): Promise<RecipeDetails> {
+    @Inject(PANTRY_REPOSITORY)
+    private readonly pantryRepo: IPantryRepository,
+  ) { }
+
+  async execute(id: number, userId?: string): Promise<RecipeDetails> {
     if (!Number.isFinite(id) || id <= 0) {
       throw new NotFoundException('Recipe not found');
     }
 
     const cached = await this.cache.getDetails(id);
-    if (cached) return cached;
+    let recipe = cached;
 
-    const result = await this.provider.getDetails(id);
-    await this.cache.setDetails(id, result);
+    if (!recipe) {
+      recipe = await this.provider.getDetails(id);
+      await this.cache.setDetails(id, recipe);
+    }
 
-    return result;
+    // If userId provided, cross-reference with pantry
+    if (userId && recipe.ingredients) {
+      const pantry = await this.pantryRepo.list(userId);
+      const pantryNames = new Set(
+        pantry.map((p) => p.name.toLowerCase().trim()),
+      );
+
+      recipe = {
+        ...recipe,
+        ingredients: recipe.ingredients.map((ing) => ({
+          ...ing,
+          status: pantryNames.has(ing.name.toLowerCase().trim())
+            ? 'available'
+            : 'missing',
+        })),
+      };
+    } else if (recipe.ingredients) {
+      recipe = {
+        ...recipe,
+        ingredients: recipe.ingredients.map((ing) => ({
+          ...ing,
+          status: 'neutral',
+        })),
+      };
+    }
+
+    return recipe;
   }
 }
