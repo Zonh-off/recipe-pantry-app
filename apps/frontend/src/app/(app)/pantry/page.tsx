@@ -20,8 +20,8 @@ export default function PantryPage() {
     const [search, setSearch] = useState("");
     const router = useRouter();
 
-    const handleAdd = (name: string, amount: string, category: string) => {
-        addMutation.mutate({ name, amount, category });
+    const handleAdd = (name: string, amount: number, unit: string) => {
+        addMutation.mutate({ ingredientName: name, amount, unit });
     };
 
     const handleRemove = (id: string | number) => {
@@ -30,7 +30,7 @@ export default function PantryPage() {
 
     const filteredIngredients = ingredients.filter(i =>
         i.name.toLowerCase().includes(search.toLowerCase()) ||
-        (i.category?.toLowerCase().includes(search.toLowerCase()))
+        (i.unit?.toLowerCase().includes(search.toLowerCase()))
     );
 
     const handleFindRecipes = () => {

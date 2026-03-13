@@ -6,22 +6,23 @@ import { Plus } from "lucide-react";
 
 interface AddIngredientModalProps {
     trigger?: React.ReactElement;
-    onAdd: (name: string, amount: string, category: string) => void;
+    onAdd: (name: string, amount: number, unit: string) => void;
 }
 
-const CATEGORIES = ["Vegetables", "Fruits", "Spices", "Grains", "Dairy", "Meat", "Other"];
+const UNITS = ["g", "ml", "kg", "l", "item", "Other"];
 
 export function AddIngredientModal({ trigger, onAdd }: AddIngredientModalProps) {
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
-    const [amount, setAmount] = useState("");
-    const [category, setCategory] = useState("Other");
+    const [amount, setAmount] = useState<number | undefined>(undefined);
+    const [unit, setUnit] = useState("Other");
 
     const handleAdd = () => {
         if (!name) return;
-        onAdd(name, amount, category);
+        if (!amount || amount <= 0) return;
+        onAdd(name, amount, unit);
         setName("");
-        setAmount("");
+        setAmount(undefined);
         setOpen(false);
     };
 
@@ -51,23 +52,24 @@ export function AddIngredientModal({ trigger, onAdd }: AddIngredientModalProps) 
                 <AppInput
                     label="Amount"
                     placeholder="e.g. 500g, 2 items"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    type="number"
+                    value={amount ?? ""}
+                    onChange={(e) => setAmount(e.target.value ? +e.target.value : undefined)}
                 />
                 <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700">Category</label>
-                    <div className="flex flex-wrap gap-2">
-                        {CATEGORIES.map((cat) => (
+                    <label className="text-sm font-medium text-slate-700">Unit</label>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                        {UNITS.map((u) => (
                             <button
-                                key={cat}
+                                key={u}
                                 type="button"
-                                onClick={() => setCategory(cat)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${category === cat
-                                        ? "bg-green-600 text-white shadow-md shadow-green-600/20"
-                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                onClick={() => setUnit(u)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${u === unit
+                                    ? "bg-green-600 text-white shadow-md shadow-green-600/20"
+                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                                     }`}
                             >
-                                {cat}
+                                {u}
                             </button>
                         ))}
                     </div>

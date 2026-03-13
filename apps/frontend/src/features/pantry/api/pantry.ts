@@ -5,14 +5,18 @@ export interface Ingredient {
     id: string;
     name: string;
     amount?: string;
-    category?: string;
     unit?: string;
 }
 
 export interface AddIngredientDto {
-    name: string;
-    amount?: string;
-    category?: string;
+    ingredientName: string;
+    amount?: number;
+    unit?: string;
+}
+
+export interface UpdateIngredientDto {
+    amount?: number;
+    unit?: string;
 }
 
 /* ─── API Methods ─────────────────────────────────────────── */
@@ -32,7 +36,7 @@ export const pantryApi = {
         await apiClient.delete(`/pantry/${id}`);
     },
 
-    updateIngredient: async (id: string | number, dto: Partial<AddIngredientDto>): Promise<Ingredient> => {
+    updateIngredient: async (id: string | number, dto: UpdateIngredientDto): Promise<Ingredient> => {
         const { data } = await apiClient.patch(`/pantry/${id}`, dto);
         return data;
     },

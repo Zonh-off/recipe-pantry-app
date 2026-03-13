@@ -22,7 +22,7 @@ export class AddPantryItemUseCase {
     private readonly pantryRepo: IPantryRepository,
     @Inject(INGREDIENT_SERVICE)
     private readonly ingredientService: IIngredientService,
-  ) {}
+  ) { }
 
   async execute(data: PantryItemData): Promise<PantryItem> {
     const normalized = await this.ingredientService.normalize(
